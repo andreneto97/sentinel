@@ -1,0 +1,5 @@
+<!-- Intentionally vulnerable corpus for the Sentinel opengrep rule pack. -->
+<!-- appsec.xss.angular-inner-html-binding -->
+<div [innerHTML]="notice.body"></div>
+<!-- SAFE: interpolation escapes. -->
+<p>{{ notice.title }}</p>

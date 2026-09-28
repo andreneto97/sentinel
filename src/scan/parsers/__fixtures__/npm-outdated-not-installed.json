@@ -1,0 +1,23 @@
+{
+  "chalk": {
+    "wanted": "4.1.2",
+    "latest": "6.0.0",
+    "dependent": "npmrepo2",
+    "type": "dependencies",
+    "homepage": "https://github.com/chalk/chalk#readme"
+  },
+  "left-pad": {
+    "wanted": "1.3.0",
+    "latest": "1.3.0",
+    "dependent": "npmrepo2",
+    "type": "dependencies",
+    "homepage": "https://github.com/stevemao/left-pad#readme"
+  },
+  "semver": {
+    "wanted": "7.5.0",
+    "latest": "7.8.5",
+    "dependent": "npmrepo2",
+    "type": "dependencies",
+    "homepage": "https://github.com/npm/node-semver#readme"
+  }
+}

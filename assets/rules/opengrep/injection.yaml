@@ -1,0 +1,203 @@
+# Sentinel rule pack -- SQL / NoSQL / command / path injection (D2 appsec).
+rules:
+  - id: appsec.injection.sql-built-from-variables
+    message: >-
+      A SQL statement is assembled by string interpolation or concatenation and
+      then executed. What that means depends on where each interpolated
+      expression comes from, which a pattern cannot see -- so Sentinel resolves
+      every one of them in the file the match sits in and states the answer
+      below, naming the declaration it reached. An expression the code fixes (a
+      module constant, a literal union, an `as const` set, a numeric coercion)
+      cannot carry SQL; one that arrives from a caller can, and then a crafted
+      value reads, changes or deletes rows the caller was never allowed to
+      touch. Pass the values as parameters (`query(text, [values])`, a tagged
+      template, or the ORM's builder) instead of building the string.
+    severity: ERROR
+    languages: [javascript, typescript]
+    metadata:
+      sentinelDomain: appsec
+      sentinelSeverity: critical
+      sentinelConfidence: medium
+      category: security
+      subcategory: [vuln]
+      technology: [sql]
+      cwe:
+        - "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
+      owasp:
+        - "A03:2021 - Injection"
+      tags:
+        - sentinel-domain:appsec
+        - sentinel-severity:critical
+        - sentinel-confidence:medium
+        - 'sentinel-title:SQL assembled by string interpolation'
+        - 'sentinel-impact:A value a caller controls changes the statement, which allows reading, altering or deleting rows the caller was never granted. Which of the interpolated expressions can carry such a value is stated in the description.'
+        - 'sentinel-fix:Pass the values as bound parameters -- query(text, [values]), a tagged template, or the ORM''s builder.'
+    patterns:
+      - pattern-either:
+          - pattern: $DB.query(`...${$X}...`, ...)
+          - pattern: $DB.execute(`...${$X}...`, ...)
+          - pattern: $DB.$CLIENT.query(`...${$X}...`, ...)
+          # A concatenation chain nests to the left, so match any `+` argument
+          # and exclude the all-literal case below.
+          - pattern: $DB.query($A + $B, ...)
+          - pattern: $DB.execute($A + $B, ...)
+          - pattern: $DB.$CLIENT.query($A + $B, ...)
+      # A tagged template (sql`...`, prisma.$queryRaw`...`) is parameterised by
+      # the driver, so it is not this finding.
+      - pattern-not: sql`...`
+      - pattern-not: $DB.query(sql`...`, ...)
+      - pattern-not: $DB.query("..." + "...", ...)
+      - pattern-not: $DB.execute("..." + "...", ...)
+
+  - id: appsec.injection.raw-query-unsafe
+    message: >-
+      This call runs a raw SQL string that the ORM does not parameterise --
+      `$queryRawUnsafe` / `$executeRawUnsafe` and `knex.raw` pass the string
+      through untouched. Built from anything but a constant, it is a direct SQL
+      injection; Sentinel resolves what the string is built from in the file the
+      match sits in and states it below. Use the parameterised form (`$queryRaw`
+      tagged template, `knex.raw("... ?", [value])`, `replacements`) or the query
+      builder.
+    severity: ERROR
+    languages: [javascript, typescript]
+    metadata:
+      sentinelDomain: appsec
+      sentinelSeverity: critical
+      sentinelConfidence: medium
+      category: security
+      subcategory: [vuln]
+      technology: [prisma, knex, sequelize]
+      cwe:
+        - "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"
+      owasp:
+        - "A03:2021 - Injection"
+      tags:
+        - sentinel-domain:appsec
+        - sentinel-severity:critical
+        - sentinel-confidence:medium
+        - 'sentinel-title:Raw SQL executed without parameterisation'
+        - 'sentinel-impact:The string is sent to the database untouched, so anything interpolated into it is executed as SQL.'
+        - 'sentinel-fix:Use the parameterised form ($queryRaw tagged template, knex.raw with bindings) or the query builder.'
+    patterns:
+      - pattern-either:
+          - pattern: $DB.$queryRawUnsafe($SQL, ...)
+          - pattern: $DB.$executeRawUnsafe($SQL, ...)
+          - pattern: $KNEX.raw(`...${$X}...`, ...)
+          - pattern: $KNEX.raw($A + $B, ...)
+      - pattern-not: $DB.$queryRawUnsafe("...")
+      - pattern-not: $DB.$executeRawUnsafe("...")
+
+  - id: appsec.injection.command-interpolation
+    message: >-
+      A shell command is built by interpolating a variable and then executed.
+      `exec` / `execSync` run the string through `/bin/sh`, so a value
+      containing `;`, backticks or `$(...)` runs a second command as the
+      application user. Sentinel resolves where each interpolated expression
+      comes from in the file the match sits in and states it below: a value the
+      code fixes carries no metacharacter, one that arrives from a caller does.
+      Use `execFile` / `spawn` with an argument array, and validate the value
+      against an allow-list.
+    severity: ERROR
+    languages: [javascript, typescript]
+    metadata:
+      sentinelDomain: appsec
+      sentinelSeverity: critical
+      sentinelConfidence: high
+      category: security
+      subcategory: [vuln]
+      technology: [nodejs]
+      cwe:
+        - "CWE-78: Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')"
+      owasp:
+        - "A03:2021 - Injection"
+      tags:
+        - sentinel-domain:appsec
+        - sentinel-severity:critical
+        - sentinel-confidence:high
+        - 'sentinel-title:Shell command built from a variable'
+        - 'sentinel-impact:A value containing ; , backticks or $(...) runs a second command as the application user.'
+        - 'sentinel-fix:Call execFile or spawn with an argument array, and validate the value against an allow-list.'
+    pattern-either:
+      - pattern: exec(`...${$X}...`, ...)
+      - pattern: exec("..." + $X, ...)
+      - pattern: execSync(`...${$X}...`, ...)
+      - pattern: execSync("..." + $X, ...)
+      - pattern: $CP.exec(`...${$X}...`, ...)
+      - pattern: $CP.exec("..." + $X, ...)
+      - pattern: $CP.execSync(`...${$X}...`, ...)
+      - pattern: $CP.execSync("..." + $X, ...)
+      - pattern: $CP.spawnSync(`...${$X}...`, ...)
+
+  - id: appsec.injection.nosql-where-operator
+    message: >-
+      A MongoDB query uses the `$where` operator, which evaluates JavaScript on
+      the database server for every candidate document. A value that reaches it
+      can read the whole collection, and the operator cannot be indexed, so it
+      is also a denial-of-service lever. Express the condition with normal query
+      operators instead.
+    severity: ERROR
+    languages: [javascript, typescript]
+    metadata:
+      sentinelDomain: appsec
+      sentinelSeverity: high
+      sentinelConfidence: high
+      category: security
+      subcategory: [vuln]
+      technology: [mongodb]
+      cwe:
+        - "CWE-943: Improper Neutralization of Special Elements in Data Query Logic"
+      owasp:
+        - "A03:2021 - Injection"
+      tags:
+        - sentinel-domain:appsec
+        - sentinel-severity:high
+        - sentinel-confidence:high
+        - 'sentinel-title:MongoDB $where operator in a query'
+        - 'sentinel-impact:The expression runs as JavaScript on the database server for every document, which leaks data and cannot be indexed.'
+        - 'sentinel-fix:Express the condition with normal query operators so it is both safe and indexable.'
+    # The bare object pattern already covers every call that takes such a
+    # filter, so matching `find` / `findOne` as well would report twice.
+    pattern: '{ ..., $where: $X, ... }'
+
+  - id: appsec.injection.path-from-request-input
+    message: >-
+      A filesystem path is built from request input. A value like
+      `../../.env` walks out of the intended directory, which turns a download
+      or upload endpoint into arbitrary file read or write. Resolve the path and
+      assert it still sits inside the intended root, or map the request value
+      through a lookup table of allowed names.
+    severity: ERROR
+    languages: [javascript, typescript]
+    metadata:
+      sentinelDomain: appsec
+      sentinelSeverity: high
+      sentinelConfidence: high
+      category: security
+      subcategory: [vuln]
+      technology: [nodejs]
+      cwe:
+        - "CWE-22: Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal')"
+      owasp:
+        - "A01:2021 - Broken Access Control"
+      tags:
+        - sentinel-domain:appsec
+        - sentinel-severity:high
+        - sentinel-confidence:high
+        - 'sentinel-title:Filesystem path built from request input'
+        - 'sentinel-impact:A value like ../../.env walks out of the intended directory, turning the endpoint into arbitrary file read or write.'
+        - 'sentinel-fix:Resolve the path and assert it is still inside the intended root, or map the request value through a table of allowed names.'
+    patterns:
+      - pattern-either:
+          - pattern: $PATH.join(..., $REQ.$FIELD.$NAME, ...)
+          - pattern: $PATH.resolve(..., $REQ.$FIELD.$NAME, ...)
+          - pattern: $PATH.join(..., $REQ.$FIELD[$NAME], ...)
+          - pattern: $PATH.resolve(..., $REQ.$FIELD[$NAME], ...)
+      - metavariable-regex:
+          metavariable: $PATH
+          regex: ^(path|nodePath|posix)$
+      - metavariable-regex:
+          metavariable: $REQ
+          regex: ^(req|request|ctx)$
+      - metavariable-regex:
+          metavariable: $FIELD
+          regex: ^(query|params|body|headers|cookies)$

@@ -1,0 +1,46 @@
+# Sentinel's own pipeline, written to pass Sentinel's delivery rules: third-party
+# actions pinned to a commit SHA rather than a mutable tag, the narrowest
+# permissions the job needs, and a concurrency group so a push supersedes its own
+# in-flight run instead of racing it.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    name: typecheck · lint · test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: latest
+
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      - name: Typecheck
+        run: bun run typecheck
+
+      - name: Lint
+        run: bun run lint
+
+      # Includes src/meta/no-real-world-data.test.ts, which fails the build if
+      # anything resembling a real organisation, credential, path or measured
+      # case history reaches the tree.
+      - name: Test
+        run: bun test src

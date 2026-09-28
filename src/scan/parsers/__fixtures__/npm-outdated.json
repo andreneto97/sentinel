@@ -1,0 +1,29 @@
+{
+  "chalk": {
+    "current": "4.1.2",
+    "wanted": "4.1.2",
+    "latest": "6.0.0",
+    "dependent": "npmrepo2",
+    "location": "/repo/node_modules/chalk",
+    "type": "dependencies",
+    "homepage": "https://github.com/chalk/chalk#readme"
+  },
+  "rimraf": {
+    "current": "5.0.10",
+    "wanted": "5.0.10",
+    "latest": "6.1.3",
+    "dependent": "npmrepo2",
+    "location": "/repo/node_modules/rimraf",
+    "type": "devDependencies",
+    "homepage": "https://github.com/isaacs/rimraf#readme"
+  },
+  "semver": {
+    "current": "7.5.0",
+    "wanted": "7.5.0",
+    "latest": "7.8.5",
+    "dependent": "npmrepo2",
+    "location": "/repo/node_modules/semver",
+    "type": "dependencies",
+    "homepage": "https://github.com/npm/node-semver#readme"
+  }
+}

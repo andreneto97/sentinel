@@ -1,0 +1,35 @@
+service: billing
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  memorySize: 512
+  timeout: 10
+  role: arn:aws:iam::111122223333:role/shared-lambda-role
+
+functions:
+  createInvoice:
+    handler: src/handlers/invoice.create
+    memorySize: 1024
+    timeout: 30
+    reservedConcurrency: 5
+    onError: arn:aws:sqs:eu-west-1:111122223333:invoice-dlq
+    events:
+      - http:
+          path: /invoices
+          method: post
+          authorizer: aws_iam
+  processPayments:
+    handler: src/handlers/payments.process
+    events:
+      - sqs:
+          arn: arn:aws:sqs:eu-west-1:111122223333:payments
+          batchSize: 10
+      - schedule: rate(5 minutes)
+  publicReport:
+    handler: src/handlers/report.get
+    url: true
+    events:
+      - http:
+          path: /report
+          method: get

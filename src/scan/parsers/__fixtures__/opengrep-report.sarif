@@ -1,0 +1,387 @@
+{
+ "version": "2.1.0",
+ "$schema": "https://docs.oasis-open.org/sarif/sarif/v2.1.0/os/schemas/sarif-schema-2.1.0.json",
+ "runs": [
+  {
+   "invocations": [
+    {
+     "executionSuccessful": true,
+     "toolExecutionNotifications": []
+    }
+   ],
+   "results": [
+    {
+     "fingerprints": {
+      "matchBasedId/v1": "7c559ccadd92571dcfa1031abc2a56277f16d37d22133bd7ef6b65c42e3d137a0d39f35781f5233093078c884f05c63febb50d312184233e40b51797af1bdced_0"
+     },
+     "locations": [
+      {
+       "physicalLocation": {
+        "artifactLocation": {
+         "uri": "auth.js",
+         "uriBaseId": "%SRCROOT%"
+        },
+        "region": {
+         "endColumn": 62,
+         "endLine": 46,
+         "snippet": {
+          "text": "  res.cookie(\"session\", req.body.token, { maxAge: 86400000 });"
+         },
+         "startColumn": 3,
+         "startLine": 46
+        }
+       }
+      }
+     ],
+     "message": {
+      "text": "A cookie is set without the full flag set. Without `httpOnly` any script on the page can read it, which turns one XSS into stolen sessions; without `secure` it travels over plain HTTP; without `sameSite` it is attached to cross-site requests, which is what makes CSRF work. Set `{ httpOnly: true, secure: true, sameSite: \"lax\" }` on session cookies."
+     },
+     "properties": {},
+     "ruleId": "appsec.auth.insecure-cookie-flags"
+    },
+    {
+     "fingerprints": {
+      "matchBasedId/v1": "04c6f6a1150ed3b9f896e1c1f07f92994a188b4c781dfe207aa929e01ed1596d6a68766036673374f20184a69f0102ddd6fd0bf2169a4fa80ec2f01333448a20_0"
+     },
+     "locations": [
+      {
+       "physicalLocation": {
+        "artifactLocation": {
+         "uri": "injection.js",
+         "uriBaseId": "%SRCROOT%"
+        },
+        "region": {
+         "endColumn": 66,
+         "endLine": 9,
+         "snippet": {
+          "text": "  return db.query(`SELECT * FROM users WHERE email = '${email}'`);"
+         },
+         "startColumn": 10,
+         "startLine": 9
+        }
+       }
+      }
+     ],
+     "message": {
+      "text": "A SQL statement is assembled by string interpolation or concatenation and then executed. Any value that reaches the interpolated expression becomes part of the statement, so a crafted input can read, change or delete rows the caller was never allowed to touch. Pass the values as parameters (`query(text, [values])`, a tagged template, or the ORM's builder) instead of building the string."
+     },
+     "properties": {},
+     "ruleId": "appsec.injection.sql-built-from-variables"
+    },
+    {
+     "fingerprints": {
+      "matchBasedId/v1": "16595af92e70733a49f803e708d7d28d496084490c7d5c5e2cb67362ac1dc7d9ac822f95bfc7a9d3ab164c626a5dd809e943bdcfdc315cb10efcdcff28072816_0"
+     },
+     "locations": [
+      {
+       "physicalLocation": {
+        "artifactLocation": {
+         "uri": "server.js",
+         "uriBaseId": "%SRCROOT%"
+        },
+        "region": {
+         "endColumn": 18,
+         "endLine": 26,
+         "snippet": {
+          "text": "const app = express();\n\n/** appsec.cors.reflects-any-origin-with-credentials */\napp.use(cors({ origin: true, credentials: true }));\n\n/** delivery.express.body-parser-without-limit */\napp.use(express.json());\n\n/** appsec.injection.child-process-in-request-handler */\napp.get(\"/export\", (req, res) => {\n  const output = execSync(\"pg_dump mydb\");\n  res.send(output);\n});\n\n/** delivery.node.tls-verification-disabled */\nprocess.env.NODE_TLS_REJECT_UNAUTHORIZED = \"0\";\n\n/** delivery.express.missing-helmet \ufffd\ufffd\ufffd this app never mounts helmet. */\napp.listen(3000);"
+         },
+         "startColumn": 1,
+         "startLine": 8
+        }
+       }
+      }
+     ],
+     "message": {
+      "text": "This Express app starts without `helmet()` in the middleware chain, so responses ship with no HSTS, no `X-Content-Type-Options`, no frame protection and no referrer policy. Those headers are what stop clickjacking, MIME sniffing and referrer leakage. Add `app.use(helmet())` before the routes."
+     },
+     "properties": {},
+     "ruleId": "delivery.express.missing-helmet"
+    },
+    {
+     "fingerprints": {
+      "matchBasedId/v1": "c272a5aaba0441ca9f274a7f875945111e3b27189db8f57818fc6015b2382c7dc6622843bc66ba3d5d7ecf34c4afd6b0366be8ce7e11efd440d942ce34f52896_0"
+     },
+     "locations": [
+      {
+       "physicalLocation": {
+        "artifactLocation": {
+         "uri": "server.js",
+         "uriBaseId": "%SRCROOT%"
+        },
+        "region": {
+         "endColumn": 47,
+         "endLine": 23,
+         "snippet": {
+          "text": "process.env.NODE_TLS_REJECT_UNAUTHORIZED = \"0\";"
+         },
+         "startColumn": 1,
+         "startLine": 23
+        }
+       }
+      }
+     ],
+     "message": {
+      "text": "TLS certificate verification is switched off. Every outbound HTTPS call from this process now accepts any certificate, so anything on the network path can read and rewrite the traffic -- including the calls that carry API keys. If a self-signed certificate is the reason, pin that CA instead with `NODE_EXTRA_CA_CERTS` or an explicit `ca` option."
+     },
+     "properties": {},
+     "ruleId": "delivery.node.tls-verification-disabled"
+    },
+    {
+     "fingerprints": {
+      "matchBasedId/v1": "884aba73a0d526fc42859dab393071b40946b152df84a924f2061e1967c050e8b5fa87d06c7c18950613527c156670c637893885b7b4aee24c4647610f81964f_0"
+     },
+     "locations": [
+      {
+       "physicalLocation": {
+        "artifactLocation": {
+         "uri": "widget.vue",
+         "uriBaseId": "%SRCROOT%"
+        },
+        "region": {
+         "endColumn": 26,
+         "endLine": 4,
+         "snippet": {
+          "text": "  <div v-html=\"post.body\"></div>"
+         },
+         "startColumn": 7,
+         "startLine": 4
+        }
+       }
+      }
+     ],
+     "message": {
+      "text": "`v-html` renders its expression as raw HTML, bypassing Vue's escaping. If the bound value carries anything a user can influence, the markup in it -- including `<script>` and `onerror` attributes -- runs in the visitor's session. Bind with `{{ }}` for text, or sanitise the HTML before binding."
+     },
+     "properties": {},
+     "ruleId": "appsec.xss.vue-v-html"
+    },
+    {
+     "fingerprints": {
+      "matchBasedId/v1": "07d8b07dfdbe5aa472c64624a01e7dda7a783fa9a0ac741a617116e214618fd0274b6bd19b3a82532445b64955ca5cc3b3e2320a54b1bab86219c5a019ce3df0_0"
+     },
+     "locations": [
+      {
+       "physicalLocation": {
+        "artifactLocation": {
+         "uri": "xss.js",
+         "uriBaseId": "%SRCROOT%"
+        },
+        "region": {
+         "endColumn": 30,
+         "endLine": 7,
+         "snippet": {
+          "text": "  el.innerHTML = comment.body;"
+         },
+         "startColumn": 3,
+         "startLine": 7
+        }
+       }
+      }
+     ],
+     "message": {
+      "text": "A value is written into the DOM as markup (`innerHTML` / `outerHTML` / `insertAdjacentHTML`), so the browser parses it as HTML instead of displaying it as text. Any user-controlled fragment in that value can inject script that runs with the visitor's session. Use `textContent` when the value is text, or sanitise it with DOMPurify when it really has to be HTML."
+     },
+     "properties": {},
+     "ruleId": "appsec.xss.inner-html-assignment"
+    }
+   ],
+   "tool": {
+    "driver": {
+     "name": "Opengrep OSS",
+     "rules": [
+      {
+       "defaultConfiguration": {
+        "level": "warning"
+       },
+       "fullDescription": {
+        "text": "A cookie is set without the full flag set. Without `httpOnly` any script on the page can read it, which turns one XSS into stolen sessions; without `secure` it travels over plain HTTP; without `sameSite` it is attached to cross-site requests, which is what makes CSRF work. Set `{ httpOnly: true, secure: true, sameSite: \"lax\" }` on session cookies."
+       },
+       "help": {
+        "markdown": "A cookie is set without the full flag set. Without `httpOnly` any script on the page can read it, which turns one XSS into stolen sessions; without `secure` it travels over plain HTTP; without `sameSite` it is attached to cross-site requests, which is what makes CSRF work. Set `{ httpOnly: true, secure: true, sameSite: \"lax\" }` on session cookies.",
+        "text": "A cookie is set without the full flag set. Without `httpOnly` any script on the page can read it, which turns one XSS into stolen sessions; without `secure` it travels over plain HTTP; without `sameSite` it is attached to cross-site requests, which is what makes CSRF work. Set `{ httpOnly: true, secure: true, sameSite: \"lax\" }` on session cookies."
+       },
+       "id": "appsec.auth.insecure-cookie-flags",
+       "name": "appsec.auth.insecure-cookie-flags",
+       "properties": {
+        "precision": "very-high",
+        "tags": [
+         "CWE-1004: Sensitive Cookie Without 'HttpOnly' Flag",
+         "CWE-1275: Sensitive Cookie with Improper SameSite Attribute",
+         "CWE-614: Sensitive Cookie in HTTPS Session Without 'Secure' Attribute",
+         "OWASP-A05:2021 - Security Misconfiguration",
+         "security",
+         "sentinel-confidence:medium",
+         "sentinel-domain:appsec",
+         "sentinel-fix:Set { httpOnly: true, secure: true, sameSite: \"lax\" } on session cookies.",
+         "sentinel-impact:Without httpOnly one XSS steals the session; without secure it crosses plain HTTP; without sameSite it enables CSRF.",
+         "sentinel-severity:high",
+         "sentinel-title:Cookie set without the full flag set"
+        ]
+       },
+       "shortDescription": {
+        "text": "Opengrep Finding: appsec.auth.insecure-cookie-flags"
+       }
+      },
+      {
+       "defaultConfiguration": {
+        "level": "error"
+       },
+       "fullDescription": {
+        "text": "A SQL statement is assembled by string interpolation or concatenation and then executed. Any value that reaches the interpolated expression becomes part of the statement, so a crafted input can read, change or delete rows the caller was never allowed to touch. Pass the values as parameters (`query(text, [values])`, a tagged template, or the ORM's builder) instead of building the string."
+       },
+       "help": {
+        "markdown": "A SQL statement is assembled by string interpolation or concatenation and then executed. Any value that reaches the interpolated expression becomes part of the statement, so a crafted input can read, change or delete rows the caller was never allowed to touch. Pass the values as parameters (`query(text, [values])`, a tagged template, or the ORM's builder) instead of building the string.",
+        "text": "A SQL statement is assembled by string interpolation or concatenation and then executed. Any value that reaches the interpolated expression becomes part of the statement, so a crafted input can read, change or delete rows the caller was never allowed to touch. Pass the values as parameters (`query(text, [values])`, a tagged template, or the ORM's builder) instead of building the string."
+       },
+       "id": "appsec.injection.sql-built-from-variables",
+       "name": "appsec.injection.sql-built-from-variables",
+       "properties": {
+        "precision": "very-high",
+        "tags": [
+         "CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')",
+         "OWASP-A03:2021 - Injection",
+         "security",
+         "sentinel-confidence:medium",
+         "sentinel-domain:appsec",
+         "sentinel-fix:Pass the values as bound parameters -- query(text, [values]), a tagged template, or the ORM's builder.",
+         "sentinel-impact:A crafted value changes the statement, which allows reading, altering or deleting rows the caller was never granted.",
+         "sentinel-severity:critical",
+         "sentinel-title:SQL assembled by string interpolation"
+        ]
+       },
+       "shortDescription": {
+        "text": "Opengrep Finding: appsec.injection.sql-built-from-variables"
+       }
+      },
+      {
+       "defaultConfiguration": {
+        "level": "error"
+       },
+       "fullDescription": {
+        "text": "A value is written into the DOM as markup (`innerHTML` / `outerHTML` / `insertAdjacentHTML`), so the browser parses it as HTML instead of displaying it as text. Any user-controlled fragment in that value can inject script that runs with the visitor's session. Use `textContent` when the value is text, or sanitise it with DOMPurify when it really has to be HTML."
+       },
+       "help": {
+        "markdown": "A value is written into the DOM as markup (`innerHTML` / `outerHTML` / `insertAdjacentHTML`), so the browser parses it as HTML instead of displaying it as text. Any user-controlled fragment in that value can inject script that runs with the visitor's session. Use `textContent` when the value is text, or sanitise it with DOMPurify when it really has to be HTML.",
+        "text": "A value is written into the DOM as markup (`innerHTML` / `outerHTML` / `insertAdjacentHTML`), so the browser parses it as HTML instead of displaying it as text. Any user-controlled fragment in that value can inject script that runs with the visitor's session. Use `textContent` when the value is text, or sanitise it with DOMPurify when it really has to be HTML."
+       },
+       "id": "appsec.xss.inner-html-assignment",
+       "name": "appsec.xss.inner-html-assignment",
+       "properties": {
+        "precision": "very-high",
+        "tags": [
+         "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')",
+         "OWASP-A03:2021 - Injection",
+         "security",
+         "sentinel-confidence:medium",
+         "sentinel-domain:appsec",
+         "sentinel-fix:Assign to textContent when the value is text; sanitise with DOMPurify when it really has to be HTML.",
+         "sentinel-impact:Script inside the assigned value runs with the visitor's session, which is enough to read the page and act as that user.",
+         "sentinel-severity:high",
+         "sentinel-title:DOM sink assigned raw markup"
+        ]
+       },
+       "shortDescription": {
+        "text": "Opengrep Finding: appsec.xss.inner-html-assignment"
+       }
+      },
+      {
+       "defaultConfiguration": {
+        "level": "error"
+       },
+       "fullDescription": {
+        "text": "`v-html` renders its expression as raw HTML, bypassing Vue's escaping. If the bound value carries anything a user can influence, the markup in it -- including `<script>` and `onerror` attributes -- runs in the visitor's session. Bind with `{{ }}` for text, or sanitise the HTML before binding."
+       },
+       "help": {
+        "markdown": "`v-html` renders its expression as raw HTML, bypassing Vue's escaping. If the bound value carries anything a user can influence, the markup in it -- including `<script>` and `onerror` attributes -- runs in the visitor's session. Bind with `{{ }}` for text, or sanitise the HTML before binding.",
+        "text": "`v-html` renders its expression as raw HTML, bypassing Vue's escaping. If the bound value carries anything a user can influence, the markup in it -- including `<script>` and `onerror` attributes -- runs in the visitor's session. Bind with `{{ }}` for text, or sanitise the HTML before binding."
+       },
+       "id": "appsec.xss.vue-v-html",
+       "name": "appsec.xss.vue-v-html",
+       "properties": {
+        "precision": "very-high",
+        "tags": [
+         "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')",
+         "OWASP-A03:2021 - Injection",
+         "security",
+         "sentinel-confidence:medium",
+         "sentinel-domain:appsec",
+         "sentinel-fix:Bind with {{ }} for text, or sanitise the HTML before binding it.",
+         "sentinel-impact:Markup in the bound value, including script tags and onerror attributes, runs in the visitor's session.",
+         "sentinel-severity:high",
+         "sentinel-title:Vue v-html renders unescaped HTML"
+        ]
+       },
+       "shortDescription": {
+        "text": "Opengrep Finding: appsec.xss.vue-v-html"
+       }
+      },
+      {
+       "defaultConfiguration": {
+        "level": "warning"
+       },
+       "fullDescription": {
+        "text": "This Express app starts without `helmet()` in the middleware chain, so responses ship with no HSTS, no `X-Content-Type-Options`, no frame protection and no referrer policy. Those headers are what stop clickjacking, MIME sniffing and referrer leakage. Add `app.use(helmet())` before the routes."
+       },
+       "help": {
+        "markdown": "This Express app starts without `helmet()` in the middleware chain, so responses ship with no HSTS, no `X-Content-Type-Options`, no frame protection and no referrer policy. Those headers are what stop clickjacking, MIME sniffing and referrer leakage. Add `app.use(helmet())` before the routes.",
+        "text": "This Express app starts without `helmet()` in the middleware chain, so responses ship with no HSTS, no `X-Content-Type-Options`, no frame protection and no referrer policy. Those headers are what stop clickjacking, MIME sniffing and referrer leakage. Add `app.use(helmet())` before the routes."
+       },
+       "id": "delivery.express.missing-helmet",
+       "name": "delivery.express.missing-helmet",
+       "properties": {
+        "precision": "very-high",
+        "tags": [
+         "CWE-1021: Improper Restriction of Rendered UI Layers or Frames",
+         "CWE-693: Protection Mechanism Failure",
+         "OWASP-A05:2021 - Security Misconfiguration",
+         "security",
+         "sentinel-confidence:low",
+         "sentinel-domain:delivery",
+         "sentinel-fix:Add app.use(helmet()) before the routes.",
+         "sentinel-impact:Responses ship without HSTS, frame protection, MIME-sniffing protection or a referrer policy.",
+         "sentinel-severity:medium",
+         "sentinel-title:Express app starts without security headers"
+        ]
+       },
+       "shortDescription": {
+        "text": "Opengrep Finding: delivery.express.missing-helmet"
+       }
+      },
+      {
+       "defaultConfiguration": {
+        "level": "error"
+       },
+       "fullDescription": {
+        "text": "TLS certificate verification is switched off. Every outbound HTTPS call from this process now accepts any certificate, so anything on the network path can read and rewrite the traffic -- including the calls that carry API keys. If a self-signed certificate is the reason, pin that CA instead with `NODE_EXTRA_CA_CERTS` or an explicit `ca` option."
+       },
+       "help": {
+        "markdown": "TLS certificate verification is switched off. Every outbound HTTPS call from this process now accepts any certificate, so anything on the network path can read and rewrite the traffic -- including the calls that carry API keys. If a self-signed certificate is the reason, pin that CA instead with `NODE_EXTRA_CA_CERTS` or an explicit `ca` option.",
+        "text": "TLS certificate verification is switched off. Every outbound HTTPS call from this process now accepts any certificate, so anything on the network path can read and rewrite the traffic -- including the calls that carry API keys. If a self-signed certificate is the reason, pin that CA instead with `NODE_EXTRA_CA_CERTS` or an explicit `ca` option."
+       },
+       "id": "delivery.node.tls-verification-disabled",
+       "name": "delivery.node.tls-verification-disabled",
+       "properties": {
+        "precision": "very-high",
+        "tags": [
+         "CWE-295: Improper Certificate Validation",
+         "OWASP-A02:2021 - Cryptographic Failures",
+         "security",
+         "sentinel-confidence:high",
+         "sentinel-domain:delivery",
+         "sentinel-fix:Remove the override and pin the CA with NODE_EXTRA_CA_CERTS or an explicit ca option instead.",
+         "sentinel-impact:Every outbound HTTPS call accepts any certificate, so anything on the network path can read and rewrite the traffic.",
+         "sentinel-severity:high",
+         "sentinel-title:TLS certificate verification disabled"
+        ]
+       },
+       "shortDescription": {
+        "text": "Opengrep Finding: delivery.node.tls-verification-disabled"
+       }
+      }
+     ],
+     "semanticVersion": "1.30.0"
+    }
+   }
+  }
+ ]
+}

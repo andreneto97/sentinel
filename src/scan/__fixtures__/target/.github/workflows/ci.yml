@@ -1,0 +1,14 @@
+name: ci
+on:
+  pull_request_target:
+    branches: [main]
+permissions: write-all
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: greet
+        run: echo "${{ github.event.pull_request.title }}"

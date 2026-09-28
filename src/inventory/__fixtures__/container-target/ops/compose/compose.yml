@@ -1,0 +1,85 @@
+# The development stack: a cloud emulator, a search dashboard, the app in a
+# watcher image, Postgres and Redis. The multi-line flow sequence that stops the
+# YAML reader lives in `compose-tests.yml`, so this file parses to the end.
+services:
+  localstack:
+    build:
+      context: ../../
+      dockerfile: ./ops/emulator/Dockerfile
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:4566/_localstack/health']
+      interval: 2s
+    ports:
+      - '4566:4566'
+      - '4571:4571'
+    environment:
+      - SERVICES=s3,sqs,sns,secretsmanager
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - LOCALSTACK_AUTH_TOKEN=${LOCALSTACK_AUTH_TOKEN- }
+    volumes:
+      - '../emulator/ready.d:/etc/localstack/init/ready.d'
+      - '/var/run/docker.sock:/var/run/docker.sock'
+      - '../../:/workspace'
+    networks:
+      - dock-api
+
+  opensearch-dashboard:
+    image: opensearchproject/opensearch-dashboards:2.17.0
+    ports:
+      - '5601:5601'
+    environment:
+      - OPENSEARCH_HOSTS=http://localstack:4566/trip-search
+    networks:
+      - dock-api
+
+  nodejs:
+    build:
+      dockerfile: ./ops/compose/devbox/Dockerfile
+      context: ../../
+      args:
+        DOCKER_USER_ID: ${userId}
+        DOCKER_GROUP_ID: ${groupId}
+    healthcheck:
+      test: 'curl -f localhost:3001/health-check > /dev/null || exit 1'
+      interval: 5s
+    environment:
+      NODE_ENV: dev
+      NODE_AUTH_TOKEN: ${NODE_AUTH_TOKEN}
+    volumes:
+      - ../../:/app
+    user: '${userId}:${groupId}'
+    ports:
+      - '3001:3001'
+      - '9229:9229'
+    restart: always
+
+  db:
+    image: postgres:16.4
+    restart: always
+    volumes:
+      - ./db/initdb.d:/docker-entrypoint-initdb.d
+      - db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - PGUSER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '55432:5432'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -h db']
+      interval: 1s
+
+  redis:
+    image: redis:latest
+    command: sh -c "redis-server --requirepass $$REDIS_PASSWORD"
+    ports:
+      - '127.0.0.1:6379:6379'
+    expose:
+      - 6379
+
+volumes:
+  db:
+    driver: local
+
+networks:
+  dock-api: ~

@@ -1,0 +1,110 @@
+# Sentinel rule pack -- HTML template sinks (D2 appsec).
+#
+# Vue SFCs and Angular templates are not parsed as JavaScript, so these rules run
+# in generic mode and are restricted by `paths.include` to keep the scan cheap.
+rules:
+  - id: appsec.xss.vue-v-html
+    message: >-
+      `v-html` renders its expression as raw HTML, bypassing Vue's escaping. If
+      the bound value carries anything a user can influence, the markup in it --
+      including `<script>` and `onerror` attributes -- runs in the visitor's
+      session. Bind with `{{ }}` for text, or sanitise the HTML before binding.
+    severity: ERROR
+    languages: [generic]
+    paths:
+      include:
+        - "*.vue"
+        - "*.html"
+      exclude:
+        - "node_modules"
+        - "dist"
+        - "build"
+    metadata:
+      sentinelDomain: appsec
+      sentinelSeverity: high
+      sentinelConfidence: medium
+      category: security
+      subcategory: [vuln]
+      technology: [vue]
+      cwe:
+        - "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+      owasp:
+        - "A03:2021 - Injection"
+      tags:
+        - sentinel-domain:appsec
+        - sentinel-severity:high
+        - sentinel-confidence:medium
+        - 'sentinel-title:Vue v-html renders unescaped HTML'
+        - 'sentinel-impact:Markup in the bound value, including script tags and onerror attributes, runs in the visitor''s session.'
+        - 'sentinel-fix:Bind with {{ }} for text, or sanitise the HTML before binding it.'
+    patterns:
+      - pattern-regex: (?P<SINK>\s(v-html|:inner-html\.prop)\s*=\s*"[^"]+")
+
+  - id: appsec.xss.angular-inner-html-binding
+    message: >-
+      An Angular template binds `[innerHTML]`. Angular's sanitiser strips script
+      tags but not every vector, and it is switched off entirely by
+      `bypassSecurityTrustHtml`. Prefer interpolation for text, and where HTML is
+      required sanitise it server-side and keep the value out of user control.
+    severity: WARNING
+    languages: [generic]
+    paths:
+      include:
+        - "*.component.html"
+        - "*.html"
+      exclude:
+        - "node_modules"
+        - "dist"
+        - "build"
+    metadata:
+      sentinelDomain: appsec
+      sentinelSeverity: medium
+      sentinelConfidence: medium
+      category: security
+      subcategory: [vuln]
+      technology: [angular]
+      cwe:
+        - "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+      owasp:
+        - "A03:2021 - Injection"
+      tags:
+        - sentinel-domain:appsec
+        - sentinel-severity:medium
+        - sentinel-confidence:medium
+        - 'sentinel-title:Angular template binds [innerHTML]'
+        - 'sentinel-impact:Angular''s sanitiser does not cover every vector and is switched off entirely by bypassSecurityTrustHtml.'
+        - 'sentinel-fix:Use interpolation for text; where HTML is required, sanitise it server-side and keep it out of user control.'
+    patterns:
+      - pattern-regex: (?P<SINK>\[innerHTML\]\s*=\s*"[^"]+")
+
+  - id: appsec.xss.angular-bypass-security-trust
+    message: >-
+      `bypassSecurityTrust*` turns Angular's sanitiser off for this value, which
+      is the one thing standing between a stored string and script execution in
+      the browser. Use it only on markup this application itself produced, never
+      on anything that came from a request or the database.
+    severity: ERROR
+    languages: [javascript, typescript]
+    metadata:
+      sentinelDomain: appsec
+      sentinelSeverity: high
+      sentinelConfidence: high
+      category: security
+      subcategory: [vuln]
+      technology: [angular]
+      cwe:
+        - "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+      owasp:
+        - "A03:2021 - Injection"
+      tags:
+        - sentinel-domain:appsec
+        - sentinel-severity:high
+        - sentinel-confidence:high
+        - 'sentinel-title:Angular sanitiser bypassed'
+        - 'sentinel-impact:The call removes the last barrier between a stored string and script execution in the browser.'
+        - 'sentinel-fix:Apply it only to markup this application produced itself, never to request or database values.'
+    pattern-either:
+      - pattern: $S.bypassSecurityTrustHtml(...)
+      - pattern: $S.bypassSecurityTrustScript(...)
+      - pattern: $S.bypassSecurityTrustUrl(...)
+      - pattern: $S.bypassSecurityTrustResourceUrl(...)

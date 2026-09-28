@@ -1,0 +1,14 @@
+{
+  "forbidden": [
+    {
+      "name": "no-circular",
+      "severity": "error",
+      "comment": "A repository that already cruises itself keeps its own ruleset.",
+      "from": {},
+      "to": { "circular": true }
+    }
+  ],
+  "options": {
+    "doNotFollow": { "path": ["node_modules"] }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "pure-api",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@9.1.0",
+  "dependencies": {
+    "fastify": "4.27.0",
+    "pg": "8.11.5",
+    "zod": "3.23.8"
+  },
+  "devDependencies": {
+    "typescript": "5.4.5"
+  }
+}

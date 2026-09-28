@@ -1,0 +1,17 @@
+{
+  "name": "legacy-api",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "express": "4.19.2",
+    "express-session": "1.18.0",
+    "jsonwebtoken": "9.0.2",
+    "knex": "3.1.0",
+    "mysql2": "3.9.7"
+  }
+}

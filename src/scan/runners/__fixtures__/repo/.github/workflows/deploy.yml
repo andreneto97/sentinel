@@ -1,0 +1,24 @@
+name: deploy
+on:
+  pull_request_target:
+    branches: [main]
+permissions: write-all
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: some-org/some-action@v1
+      - name: greet
+        run: echo "${{ github.event.pull_request.title }}"
+      - name: publish
+        run: npm publish --token=${{ secrets.NPM_TOKEN }}
+      - name: deprecated
+        run: echo "::set-output name=x::1"
+    container:
+      image: node:20
+      credentials:
+        username: ci
+        password: hardcoded

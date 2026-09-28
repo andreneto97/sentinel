@@ -1,0 +1,15 @@
+{
+  "name": "route-target-fixture",
+  "private": true,
+  "dependencies": {
+    "@koa/router": "13.1.0",
+    "@nestjs/common": "11.0.0",
+    "@trpc/server": "11.0.0",
+    "express": "5.1.0",
+    "fastify": "5.2.0",
+    "hono": "4.6.0",
+    "koa": "2.15.0",
+    "next": "15.1.0",
+    "zod": "4.4.3"
+  }
+}

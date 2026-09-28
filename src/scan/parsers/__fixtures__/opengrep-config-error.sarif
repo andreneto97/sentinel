@@ -1,0 +1,41 @@
+{
+ "version": "2.1.0",
+ "runs": [
+  {
+   "invocations": [
+    {
+     "executionSuccessful": true,
+     "toolExecutionNotifications": [
+      {
+       "descriptor": {
+        "id": "SemgrepError"
+       },
+       "level": "error",
+       "message": {
+        "text": "Invalid YAML file /rules/opengrep/broken.yaml:\n\twhile parsing a flow node\n\texpected the node content, but found '<stream end>'\n\t  in \"<file>\", line 4, column 1"
+       }
+      },
+      {
+       "descriptor": {
+        "id": "SemgrepError"
+       },
+       "level": "error",
+       "message": {
+        "text": "invalid configuration file found (1 configs were invalid)"
+       }
+      }
+     ]
+    }
+   ],
+   "results": [],
+   "tool": {
+    "driver": {
+     "name": "Opengrep OSS",
+     "rules": [],
+     "semanticVersion": "1.30.0"
+    }
+   }
+  }
+ ],
+ "$schema": "https://docs.oasis-open.org/sarif/sarif/v2.1.0/os/schemas/sarif-schema-2.1.0.json"
+}

@@ -1,0 +1,236 @@
+# Sentinel rule pack -- Express / Next.js runtime configuration (D2 appsec, D4 delivery).
+rules:
+  - id: appsec.cors.reflects-any-origin-with-credentials
+    message: >-
+      CORS is configured to accept any origin while also allowing credentials.
+      The browser then sends the session cookie on requests issued by any site
+      the victim visits, and lets that site read the response -- which is every
+      authenticated endpoint of this API, exposed to any page on the internet.
+      List the allowed origins explicitly.
+    severity: ERROR
+    languages: [javascript, typescript]
+    metadata:
+      sentinelDomain: appsec
+      sentinelSeverity: critical
+      sentinelConfidence: high
+      category: security
+      subcategory: [vuln]
+      technology: [express, cors]
+      cwe:
+        - "CWE-942: Permissive Cross-domain Policy with Untrusted Domains"
+      owasp:
+        - "A05:2021 - Security Misconfiguration"
+      tags:
+        - sentinel-domain:appsec
+        - sentinel-severity:critical
+        - sentinel-confidence:high
+        - 'sentinel-title:CORS reflects any origin while allowing credentials'
+        - 'sentinel-impact:Any website a logged-in user visits can call every authenticated endpoint of this API and read the response.'
+        - 'sentinel-fix:Replace the reflected origin with an explicit allow-list of trusted origins.'
+    pattern-either:
+      - pattern: 'cors({ ..., origin: true, ..., credentials: true, ... })'
+      - pattern: 'cors({ ..., origin: "*", ..., credentials: true, ... })'
+      - pattern: 'cors({ ..., credentials: true, ..., origin: true, ... })'
+      - pattern: 'cors({ ..., credentials: true, ..., origin: "*", ... })'
+
+  - id: appsec.cors.wildcard-origin
+    message: >-
+      CORS is opened to every origin. Any website can call this API from a
+      visitor's browser and read the response. That is only safe for endpoints
+      that are genuinely public and carry no user data; anything behind auth
+      needs an explicit origin allow-list.
+    severity: WARNING
+    languages: [javascript, typescript]
+    metadata:
+      sentinelDomain: appsec
+      sentinelSeverity: medium
+      sentinelConfidence: high
+      category: security
+      subcategory: [audit]
+      technology: [express, cors]
+      cwe:
+        - "CWE-942: Permissive Cross-domain Policy with Untrusted Domains"
+      owasp:
+        - "A05:2021 - Security Misconfiguration"
+      tags:
+        - sentinel-domain:appsec
+        - sentinel-severity:medium
+        - sentinel-confidence:high
+        - 'sentinel-title:CORS opened to every origin'
+        - 'sentinel-impact:Any site can read this endpoint''s responses from a visitor''s browser, which is only acceptable for genuinely public data.'
+        - 'sentinel-fix:List the allowed origins explicitly for anything that sits behind authentication.'
+    patterns:
+      - pattern-either:
+          - pattern: 'cors({ ..., origin: "*", ... })'
+          - pattern: 'cors({ ..., origin: true, ... })'
+          - pattern: $RES.setHeader("Access-Control-Allow-Origin", "*")
+          - pattern: $RES.header("Access-Control-Allow-Origin", "*")
+      - pattern-not: 'cors({ ..., credentials: true, ... })'
+
+  - id: delivery.express.body-parser-without-limit
+    message: >-
+      The JSON body parser is mounted without a size limit, so it falls back to
+      its 100 kB default only for `express.json` -- any custom parser or a raised
+      limit accepts whatever the client sends and buffers it in memory. A
+      handful of large POSTs is enough to exhaust the process. Set an explicit
+      `limit` sized to the largest legitimate payload.
+    severity: WARNING
+    languages: [javascript, typescript]
+    metadata:
+      sentinelDomain: delivery
+      sentinelSeverity: medium
+      sentinelConfidence: high
+      category: security
+      subcategory: [audit]
+      technology: [express]
+      cwe:
+        - "CWE-770: Allocation of Resources Without Limits or Throttling"
+      owasp:
+        - "A05:2021 - Security Misconfiguration"
+      tags:
+        - sentinel-domain:delivery
+        - sentinel-severity:medium
+        - sentinel-confidence:high
+        - 'sentinel-title:Body parser mounted without a size limit'
+        - 'sentinel-impact:Large POST bodies are buffered in memory, so a handful of requests can exhaust the process.'
+        - 'sentinel-fix:Set an explicit limit sized to the largest legitimate payload.'
+    patterns:
+      - pattern-either:
+          - pattern: express.json(...)
+          - pattern: express.urlencoded(...)
+          - pattern: express.raw(...)
+          - pattern: express.text(...)
+          - pattern: bodyParser.json(...)
+          - pattern: bodyParser.urlencoded(...)
+          - pattern: bodyParser.raw(...)
+      - pattern-not: 'express.json({ ..., limit: $L, ... })'
+      - pattern-not: 'express.urlencoded({ ..., limit: $L, ... })'
+      - pattern-not: 'express.raw({ ..., limit: $L, ... })'
+      - pattern-not: 'express.text({ ..., limit: $L, ... })'
+      - pattern-not: 'bodyParser.json({ ..., limit: $L, ... })'
+      - pattern-not: 'bodyParser.urlencoded({ ..., limit: $L, ... })'
+      - pattern-not: 'bodyParser.raw({ ..., limit: $L, ... })'
+
+  - id: delivery.express.missing-helmet
+    message: >-
+      This Express app starts without `helmet()` in the middleware chain, so
+      responses ship with no HSTS, no `X-Content-Type-Options`, no frame
+      protection and no referrer policy. Those headers are what stop
+      clickjacking, MIME sniffing and referrer leakage. Add `app.use(helmet())`
+      before the routes.
+    severity: WARNING
+    languages: [javascript, typescript]
+    metadata:
+      sentinelDomain: delivery
+      sentinelSeverity: medium
+      sentinelConfidence: low
+      category: security
+      subcategory: [audit]
+      technology: [express]
+      cwe:
+        - "CWE-1021: Improper Restriction of Rendered UI Layers or Frames"
+        - "CWE-693: Protection Mechanism Failure"
+      owasp:
+        - "A05:2021 - Security Misconfiguration"
+      tags:
+        - sentinel-domain:delivery
+        - sentinel-severity:medium
+        - sentinel-confidence:low
+        - 'sentinel-title:Express app starts without security headers'
+        - 'sentinel-impact:Responses ship without HSTS, frame protection, MIME-sniffing protection or a referrer policy.'
+        - 'sentinel-fix:Add app.use(helmet()) before the routes.'
+    patterns:
+      - pattern: |
+          $APP = express()
+          ...
+          $APP.listen(...)
+      - pattern-not: |
+          $APP = express()
+          ...
+          $APP.use(helmet(...))
+          ...
+          $APP.listen(...)
+
+  - id: delivery.node.tls-verification-disabled
+    message: >-
+      TLS certificate verification is switched off. Every outbound HTTPS call
+      from this process now accepts any certificate, so anything on the network
+      path can read and rewrite the traffic -- including the calls that carry API
+      keys. If a self-signed certificate is the reason, pin that CA instead with
+      `NODE_EXTRA_CA_CERTS` or an explicit `ca` option.
+    severity: ERROR
+    languages: [javascript, typescript]
+    metadata:
+      sentinelDomain: delivery
+      sentinelSeverity: high
+      sentinelConfidence: high
+      category: security
+      subcategory: [vuln]
+      technology: [nodejs, tls]
+      cwe:
+        - "CWE-295: Improper Certificate Validation"
+      owasp:
+        - "A02:2021 - Cryptographic Failures"
+      tags:
+        - sentinel-domain:delivery
+        - sentinel-severity:high
+        - sentinel-confidence:high
+        - 'sentinel-title:TLS certificate verification disabled'
+        - 'sentinel-impact:Every outbound HTTPS call accepts any certificate, so anything on the network path can read and rewrite the traffic.'
+        - 'sentinel-fix:Remove the override and pin the CA with NODE_EXTRA_CA_CERTS or an explicit ca option instead.'
+    pattern-either:
+      - pattern: process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
+      - pattern: process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0"
+      - pattern: '{ ..., rejectUnauthorized: false, ... }'
+
+  - id: appsec.injection.child-process-in-request-handler
+    message: >-
+      A request handler shells out to another process. Running a subprocess on
+      the request path gives an attacker who can influence any argument a direct
+      path to command execution, and it ties the handler's latency to the
+      subprocess. Move the work to a queue, and call the binary with an argument
+      array rather than a shell string.
+    severity: ERROR
+    languages: [javascript, typescript]
+    metadata:
+      sentinelDomain: appsec
+      sentinelSeverity: high
+      sentinelConfidence: medium
+      category: security
+      subcategory: [audit]
+      technology: [express, nextjs, nodejs]
+      cwe:
+        - "CWE-78: Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')"
+      owasp:
+        - "A03:2021 - Injection"
+      tags:
+        - sentinel-domain:appsec
+        - sentinel-severity:high
+        - sentinel-confidence:medium
+        - 'sentinel-title:Request handler spawns a subprocess'
+        - 'sentinel-impact:Any argument an attacker can influence becomes a command-execution path, and the handler''s latency follows the subprocess.'
+        - 'sentinel-fix:Move the work to a queue and invoke the binary with an argument array rather than a shell string.'
+    patterns:
+      - pattern-either:
+          - pattern-inside: $APP.$METHOD($PATH, function ($REQ, $RES) { ... })
+          - pattern-inside: $APP.$METHOD($PATH, async function ($REQ, $RES) { ... })
+          - pattern-inside: $APP.$METHOD($PATH, ($REQ, $RES) => { ... })
+          - pattern-inside: $APP.$METHOD($PATH, async ($REQ, $RES) => { ... })
+          - pattern-inside: $APP.$METHOD($PATH, ..., ($REQ, $RES) => { ... })
+          - pattern-inside: $APP.$METHOD($PATH, ..., async ($REQ, $RES) => { ... })
+          - pattern-inside: export async function $METHOD($REQ) { ... }
+          - pattern-inside: export function $METHOD($REQ) { ... }
+      - metavariable-regex:
+          metavariable: $METHOD
+          regex: ^(get|post|put|patch|delete|all|GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)$
+      - pattern-either:
+          - pattern: exec(...)
+          - pattern: execSync(...)
+          - pattern: spawn(...)
+          - pattern: spawnSync(...)
+          - pattern: execFile(...)
+          - pattern: execFileSync(...)
+          - pattern: $CP.exec(...)
+          - pattern: $CP.execSync(...)
+          - pattern: $CP.spawn(...)
+          - pattern: $CP.spawnSync(...)

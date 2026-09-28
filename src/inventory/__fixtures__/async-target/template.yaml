@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Globals:
+  Function:
+    Runtime: nodejs16.x
+    MemorySize: 256
+
+Resources:
+  ThumbnailFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/thumbnail.handler
+      Timeout: 60
+      FunctionUrlConfig:
+        AuthType: NONE
+      Events:
+        Upload:
+          Type: S3
+          Properties:
+            Bucket: uploads
+  DigestFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/digest.handler
+      ReservedConcurrentExecutions: 2
+      DeadLetterQueue:
+        Type: SQS
+        TargetArn: arn:aws:sqs:eu-west-1:111122223333:digest-dlq
+      Events:
+        Nightly:
+          Type: Schedule
+          Properties:
+            Schedule: cron(0 2 * * ? *)

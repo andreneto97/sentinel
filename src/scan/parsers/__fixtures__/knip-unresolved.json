@@ -1,0 +1,25 @@
+{
+  "issues": [
+    {
+      "file": "tsconfig.json",
+      "binaries": [],
+      "catalog": [],
+      "catalogReferences": [],
+      "dependencies": [],
+      "devDependencies": [],
+      "duplicates": [],
+      "enumMembers": [],
+      "exports": [],
+      "files": [],
+      "namespaceMembers": [],
+      "optionalPeerDependencies": [],
+      "types": [],
+      "unlisted": [],
+      "unresolved": [
+        {
+          "name": "bun-types"
+        }
+      ]
+    }
+  ]
+}

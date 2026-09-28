@@ -1,0 +1,249 @@
+{
+  "$schema": "http://cyclonedx.org/schema/bom-1.7.schema.json",
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.7",
+  "serialNumber": "urn:uuid:ebb79711-aa3a-41a7-be68-da9be4b29088",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-09-22T19:19:35+00:00",
+    "tools": {
+      "components": [
+        {
+          "type": "application",
+          "manufacturer": {
+            "name": "Aqua Security Software Ltd."
+          },
+          "group": "aquasecurity",
+          "name": "trivy",
+          "version": "0.74.0"
+        }
+      ]
+    },
+    "component": {
+      "bom-ref": "b2349fa6-4afa-4784-9576-d7f9990f55bb",
+      "type": "application",
+      "name": ".",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:SchemaVersion",
+          "value": "2"
+        }
+      ]
+    }
+  },
+  "components": [
+    {
+      "bom-ref": "8d05a93a-50e7-4fc1-b12f-2a7aee9c279d",
+      "type": "application",
+      "name": "package-lock.json",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:Class",
+          "value": "lang-pkgs"
+        },
+        {
+          "name": "aquasecurity:trivy:Type",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/body-parser@1.19.0",
+      "type": "library",
+      "name": "body-parser",
+      "version": "1.19.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "purl": "pkg:npm/body-parser@1.19.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "body-parser@1.19.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/cookie@0.4.0",
+      "type": "library",
+      "name": "cookie",
+      "version": "0.4.0",
+      "purl": "pkg:npm/cookie@0.4.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "cookie@0.4.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/express@4.17.1",
+      "type": "library",
+      "name": "express",
+      "version": "4.17.1",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:npm/express@4.17.1",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "express@4.17.1"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/lodash@4.17.15",
+      "type": "library",
+      "name": "lodash",
+      "version": "4.17.15",
+      "licenses": [
+        {
+          "license": {
+            "id": "GPL-3.0-only"
+          }
+        }
+      ],
+      "purl": "pkg:npm/lodash@4.17.15",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "lodash@4.17.15"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/qs@6.7.0",
+      "type": "library",
+      "name": "qs",
+      "version": "6.7.0",
+      "licenses": [
+        {
+          "expression": "MIT OR LGPL-2.1-or-later"
+        }
+      ],
+      "purl": "pkg:npm/qs@6.7.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "qs@6.7.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/request@2.88.2",
+      "type": "library",
+      "name": "request",
+      "version": "2.88.2",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "purl": "pkg:npm/request@2.88.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "request@2.88.2"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "npm"
+        }
+      ]
+    },
+    {
+      "bom-ref": "pkg:npm/tough-cookie@2.5.0",
+      "type": "library",
+      "name": "tough-cookie",
+      "version": "2.5.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-3-Clause"
+          }
+        }
+      ],
+      "purl": "pkg:npm/tough-cookie@2.5.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgID",
+          "value": "tough-cookie@2.5.0"
+        },
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "npm"
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "8d05a93a-50e7-4fc1-b12f-2a7aee9c279d",
+      "dependsOn": ["pkg:npm/express@4.17.1", "pkg:npm/lodash@4.17.15", "pkg:npm/request@2.88.2"]
+    },
+    {
+      "ref": "b2349fa6-4afa-4784-9576-d7f9990f55bb",
+      "dependsOn": ["8d05a93a-50e7-4fc1-b12f-2a7aee9c279d"]
+    },
+    {
+      "ref": "pkg:npm/body-parser@1.19.0",
+      "dependsOn": ["pkg:npm/qs@6.7.0"]
+    },
+    {
+      "ref": "pkg:npm/cookie@0.4.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:npm/express@4.17.1",
+      "dependsOn": ["pkg:npm/body-parser@1.19.0", "pkg:npm/cookie@0.4.0", "pkg:npm/qs@6.7.0"]
+    },
+    {
+      "ref": "pkg:npm/lodash@4.17.15",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:npm/qs@6.7.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:npm/request@2.88.2",
+      "dependsOn": ["pkg:npm/tough-cookie@2.5.0"]
+    },
+    {
+      "ref": "pkg:npm/tough-cookie@2.5.0",
+      "dependsOn": []
+    }
+  ],
+  "vulnerabilities": []
+}

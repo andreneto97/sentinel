@@ -1,0 +1,191 @@
+{
+  "modules": [
+    {
+      "source": "src/cli/analyze.ts",
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/cli/index.ts",
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/cli/setup.ts",
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/profile/__fixtures__/express-knex/knexfile.js",
+      "orphan": true,
+      "valid": false
+    },
+    {
+      "source": "src/profile/__fixtures__/express-knex/migrations/20240102000000_create_users.js",
+      "orphan": true,
+      "valid": false
+    },
+    {
+      "source": "src/profile/__fixtures__/monorepo/packages/shared/src/index.ts",
+      "orphan": true,
+      "valid": false
+    },
+    {
+      "source": "src/profile/__fixtures__/next-prisma/next.config.mjs",
+      "orphan": true,
+      "valid": false
+    },
+    {
+      "source": "src/profile/__fixtures__/next-prisma/src/app/layout.tsx",
+      "orphan": true,
+      "valid": false
+    },
+    {
+      "source": "src/profile/__fixtures__/next-prisma/src/app/page.tsx",
+      "orphan": true,
+      "valid": false
+    },
+    {
+      "source": "src/profile/__fixtures__/next-prisma/src/env.ts",
+      "orphan": true,
+      "valid": false
+    }
+  ],
+  "summary": {
+    "violations": [
+      {
+        "type": "cycle",
+        "from": "src/cli/analyze.ts",
+        "to": "src/cli/index.ts",
+        "unresolvedTo": "./index.ts",
+        "dependencyTypes": ["local", "import"],
+        "rule": {
+          "severity": "warn",
+          "name": "no-circular"
+        },
+        "cycle": [
+          {
+            "name": "src/cli/index.ts",
+            "dependencyTypes": ["local", "import"]
+          },
+          {
+            "name": "src/cli/analyze.ts",
+            "dependencyTypes": ["local", "dynamic-import"]
+          }
+        ]
+      },
+      {
+        "type": "cycle",
+        "from": "src/cli/index.ts",
+        "to": "src/cli/setup.ts",
+        "unresolvedTo": "./setup.ts",
+        "dependencyTypes": ["local", "dynamic-import"],
+        "rule": {
+          "severity": "warn",
+          "name": "no-circular"
+        },
+        "cycle": [
+          {
+            "name": "src/cli/setup.ts",
+            "dependencyTypes": ["local", "dynamic-import"]
+          },
+          {
+            "name": "src/cli/index.ts",
+            "dependencyTypes": ["local", "import"]
+          }
+        ]
+      },
+      {
+        "type": "module",
+        "from": "src/profile/__fixtures__/express-knex/knexfile.js",
+        "to": "src/profile/__fixtures__/express-knex/knexfile.js",
+        "rule": {
+          "severity": "warn",
+          "name": "no-orphans"
+        }
+      },
+      {
+        "type": "module",
+        "from": "src/profile/__fixtures__/express-knex/migrations/20240102000000_create_users.js",
+        "to": "src/profile/__fixtures__/express-knex/migrations/20240102000000_create_users.js",
+        "rule": {
+          "severity": "warn",
+          "name": "no-orphans"
+        }
+      },
+      {
+        "type": "module",
+        "from": "src/profile/__fixtures__/monorepo/packages/shared/src/index.ts",
+        "to": "src/profile/__fixtures__/monorepo/packages/shared/src/index.ts",
+        "rule": {
+          "severity": "warn",
+          "name": "no-orphans"
+        }
+      },
+      {
+        "type": "module",
+        "from": "src/profile/__fixtures__/next-prisma/next.config.mjs",
+        "to": "src/profile/__fixtures__/next-prisma/next.config.mjs",
+        "rule": {
+          "severity": "warn",
+          "name": "no-orphans"
+        }
+      },
+      {
+        "type": "module",
+        "from": "src/profile/__fixtures__/next-prisma/src/app/layout.tsx",
+        "to": "src/profile/__fixtures__/next-prisma/src/app/layout.tsx",
+        "rule": {
+          "severity": "warn",
+          "name": "no-orphans"
+        }
+      },
+      {
+        "type": "module",
+        "from": "src/profile/__fixtures__/next-prisma/src/app/page.tsx",
+        "to": "src/profile/__fixtures__/next-prisma/src/app/page.tsx",
+        "rule": {
+          "severity": "warn",
+          "name": "no-orphans"
+        }
+      },
+      {
+        "type": "module",
+        "from": "src/profile/__fixtures__/next-prisma/src/env.ts",
+        "to": "src/profile/__fixtures__/next-prisma/src/env.ts",
+        "rule": {
+          "severity": "warn",
+          "name": "no-orphans"
+        }
+      }
+    ],
+    "error": 0,
+    "warn": 9,
+    "info": 0,
+    "totalCruised": 127,
+    "totalDependenciesCruised": 345,
+    "ruleSetUsed": {
+      "forbidden": [
+        {
+          "name": "no-circular",
+          "severity": "warn",
+          "from": {},
+          "to": {
+            "circular": true
+          },
+          "scope": "module"
+        },
+        {
+          "name": "no-orphans",
+          "severity": "warn",
+          "from": {
+            "orphan": true,
+            "pathNot": "[.]d[.]ts$"
+          },
+          "to": {},
+          "scope": "module"
+        }
+      ]
+    }
+  }
+}

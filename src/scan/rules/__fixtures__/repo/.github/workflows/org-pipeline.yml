@@ -1,0 +1,72 @@
+# One delivery pipeline carrying every shape the CI severity model grades on: a
+# `workflow_run` trigger restricted to one branch, an action owned by the same
+# organisation as this repository on an exact release tag, a broad registry
+# credential handed to a step, and a reusable workflow with `secrets: inherit`.
+name: QA Pipeline
+
+on:
+  # Fires when another workflow finishes, and only for a run whose head branch
+  # is `develop` — which is what makes it a medium rather than a high.
+  workflow_run:
+    workflows: ['Tests']
+    types: ['completed']
+    branches: ['develop']
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  ACCOUNT_ID: '123456789012'
+  AWS_IAM_ROLE: 'ExampleDeployRole'
+  SLACK_CHANNEL: 'example-team-alerts'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  slack-status-start:
+    runs-on: ubuntu-latest
+    steps:
+      # Same organisation as this repository, exact release tag, single-channel
+      # webhook: the weakest corner of both severity tables.
+      - name: Slack deployment started
+        uses: example-org/action-slack-notification@v2.0.0-alpha.4
+        with:
+          slack-endpoint: ${{ secrets.SLACK_URL }}
+          slack-channel: ${{ env.SLACK_CHANNEL }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: .npmrc auth
+        shell: 'bash'
+        run: |
+          rm .npmrc
+          echo "@example-org:registry=https://npm.pkg.github.com" >> .npmrc
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.REGISTRY_PAT }}" >> .npmrc
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: arn:aws:iam::${{ env.ACCOUNT_ID }}:role/${{ env.AWS_IAM_ROLE }}
+          aws-region: us-east-1
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Example API Integration Tests
+        uses: example-org/example-api-tests@1.0.0
+        with:
+          REGISTRY_PAT: ${{ secrets.REGISTRY_PAT }}
+
+  qa-regression-tests:
+    needs: deploy
+    uses: example-org/example-qa-regression/.github/workflows/regression.yml@main
+    with:
+      service_name: 'station-api'
+    secrets: inherit

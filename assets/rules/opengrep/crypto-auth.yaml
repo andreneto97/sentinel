@@ -1,0 +1,214 @@
+# Sentinel rule pack -- crypto, tokens, session cookies (D2 appsec).
+rules:
+  - id: appsec.auth.jwt-algorithm-none
+    message: >-
+      JWT verification accepts the `none` algorithm, which means a token with an
+      empty signature is treated as valid. Anyone can mint an admin token by
+      editing the payload of a token they already hold. Pin the expected
+      algorithm explicitly, e.g. `algorithms: ["RS256"]`.
+    severity: ERROR
+    languages: [javascript, typescript]
+    metadata:
+      sentinelDomain: appsec
+      sentinelSeverity: critical
+      sentinelConfidence: high
+      category: security
+      subcategory: [vuln]
+      technology: [jwt]
+      cwe:
+        - "CWE-347: Improper Verification of Cryptographic Signature"
+      owasp:
+        - "A02:2021 - Cryptographic Failures"
+        - "A07:2021 - Identification and Authentication Failures"
+      tags:
+        - sentinel-domain:appsec
+        - sentinel-severity:critical
+        - sentinel-confidence:high
+        - 'sentinel-title:JWT verification accepts the none algorithm'
+        - 'sentinel-impact:Anyone holding any token can edit its payload, drop the signature and be accepted as any user, including an administrator.'
+        - 'sentinel-fix:Pin the expected algorithm explicitly, for example algorithms: ["RS256"].'
+    pattern-either:
+      - pattern: '$JWT.verify($TOKEN, $SECRET, { ..., algorithms: [..., "none", ...], ... })'
+      - pattern: '$JWT.verify($TOKEN, $SECRET, { ..., algorithm: "none", ... })'
+      - pattern: '$JWT.sign($PAYLOAD, $SECRET, { ..., algorithm: "none", ... })'
+      - pattern: 'jwtVerify($TOKEN, $SECRET, { ..., algorithms: [..., "none", ...], ... })'
+
+  - id: appsec.auth.jwt-hardcoded-secret
+    message: >-
+      The JWT signing or verification secret is a literal in the source. It is
+      in every clone of the repository and in the git history, so anyone with
+      read access to the code can forge a token for any user. Read the secret
+      from the environment, validate at startup that it is set, and rotate the
+      one that is committed.
+    severity: ERROR
+    languages: [javascript, typescript]
+    metadata:
+      sentinelDomain: appsec
+      sentinelSeverity: critical
+      sentinelConfidence: high
+      category: security
+      subcategory: [vuln]
+      technology: [jwt]
+      cwe:
+        - "CWE-798: Use of Hard-coded Credentials"
+        - "CWE-321: Use of Hard-coded Cryptographic Key"
+      owasp:
+        - "A07:2021 - Identification and Authentication Failures"
+      tags:
+        - sentinel-domain:appsec
+        - sentinel-severity:critical
+        - sentinel-confidence:high
+        - 'sentinel-title:JWT secret hardcoded in the source'
+        - 'sentinel-impact:Anyone with read access to the repository or its history can forge a token for any user.'
+        - 'sentinel-fix:Read the secret from the environment, fail startup when it is missing, and rotate the committed value.'
+    patterns:
+      - pattern-either:
+          - pattern: $JWT.sign($PAYLOAD, "...", ...)
+          - pattern: $JWT.verify($TOKEN, "...", ...)
+          - pattern: jwt.sign($PAYLOAD, "...", ...)
+          - pattern: jwt.verify($TOKEN, "...", ...)
+      # A one- or two-character placeholder is a test stub, not a deployed secret.
+      - pattern-not: $JWT.sign($PAYLOAD, "", ...)
+      - pattern-not: $JWT.verify($TOKEN, "", ...)
+
+  - id: appsec.crypto.weak-password-hash
+    message: >-
+      MD5 or SHA-1 is used to hash a value. Both are fast and broken for
+      password storage: a commodity GPU tries billions of candidates per second,
+      so a stolen table of these hashes is a stolen table of passwords. Use
+      bcrypt, scrypt or argon2 for passwords; for integrity use SHA-256 or
+      better.
+    severity: ERROR
+    languages: [javascript, typescript]
+    metadata:
+      sentinelDomain: appsec
+      sentinelSeverity: high
+      sentinelConfidence: medium
+      category: security
+      subcategory: [vuln]
+      technology: [crypto]
+      cwe:
+        - "CWE-916: Use of Password Hash With Insufficient Computational Effort"
+        - "CWE-327: Use of a Broken or Risky Cryptographic Algorithm"
+      owasp:
+        - "A02:2021 - Cryptographic Failures"
+      tags:
+        - sentinel-domain:appsec
+        - sentinel-severity:high
+        - sentinel-confidence:medium
+        - 'sentinel-title:MD5 or SHA-1 used to hash a value'
+        - 'sentinel-impact:Both are fast enough to brute-force at billions of guesses per second, so a stolen hash table is a stolen password table.'
+        - 'sentinel-fix:Use bcrypt, scrypt or argon2 for passwords, and SHA-256 or better for integrity.'
+    pattern-either:
+      - pattern: $CRYPTO.createHash("md5")
+      - pattern: $CRYPTO.createHash("MD5")
+      - pattern: $CRYPTO.createHash("sha1")
+      - pattern: $CRYPTO.createHash("SHA1")
+      - pattern: $CRYPTO.createHmac("md5", ...)
+      - pattern: $CRYPTO.createHmac("sha1", ...)
+      - pattern: CryptoJS.MD5(...)
+      - pattern: CryptoJS.SHA1(...)
+
+  - id: appsec.crypto.insecure-random-token
+    message: >-
+      A secret-looking value is derived from `Math.random()`, which is a fast
+      non-cryptographic generator seeded from predictable state. An attacker who
+      sees a handful of outputs can predict the next ones, which is enough to
+      guess the next session id, password-reset token or API key. Use
+      `crypto.randomUUID()` or `crypto.randomBytes(32).toString("hex")`.
+    severity: ERROR
+    languages: [javascript, typescript]
+    metadata:
+      sentinelDomain: appsec
+      sentinelSeverity: high
+      sentinelConfidence: medium
+      category: security
+      subcategory: [vuln]
+      technology: [crypto]
+      cwe:
+        - "CWE-338: Use of Cryptographically Weak Pseudo-Random Number Generator (PRNG)"
+      owasp:
+        - "A02:2021 - Cryptographic Failures"
+      tags:
+        - sentinel-domain:appsec
+        - sentinel-severity:high
+        - sentinel-confidence:medium
+        - 'sentinel-title:Secret derived from Math.random()'
+        - 'sentinel-impact:The generator is predictable from a handful of outputs, which is enough to guess the next session id or reset token.'
+        - 'sentinel-fix:Use crypto.randomUUID() or crypto.randomBytes(32).toString("hex").'
+    patterns:
+      - pattern-either:
+          - pattern: $NAME = <... Math.random() ...>
+          - pattern: function $NAME(...) { ... return <... Math.random() ...>; }
+      - metavariable-regex:
+          metavariable: $NAME
+          regex: (?i)^.*(token|secret|key|password|passwd|otp|nonce|salt|session|apikey|resetcode|verificationcode|uuid|guid)$
+
+  - id: appsec.crypto.deprecated-create-cipher
+    message: >-
+      `crypto.createCipher` / `createDecipher` derive the key from the
+      passphrase with a single unsalted MD5 pass and use a zero IV, so identical
+      plaintexts always encrypt to identical ciphertext. Node deprecated them
+      for that reason. Use `createCipheriv` with a key from a KDF and a fresh
+      random IV per message.
+    severity: ERROR
+    languages: [javascript, typescript]
+    metadata:
+      sentinelDomain: appsec
+      sentinelSeverity: high
+      sentinelConfidence: high
+      category: security
+      subcategory: [vuln]
+      technology: [crypto]
+      cwe:
+        - "CWE-327: Use of a Broken or Risky Cryptographic Algorithm"
+        - "CWE-329: Generation of Predictable IV with CBC Mode"
+      owasp:
+        - "A02:2021 - Cryptographic Failures"
+      tags:
+        - sentinel-domain:appsec
+        - sentinel-severity:high
+        - sentinel-confidence:high
+        - 'sentinel-title:Deprecated createCipher used for encryption'
+        - 'sentinel-impact:The key is derived by a single unsalted MD5 pass with a zero IV, so identical plaintexts produce identical ciphertext.'
+        - 'sentinel-fix:Use createCipheriv with a key from a KDF and a fresh random IV per message.'
+    pattern-either:
+      - pattern: $CRYPTO.createCipher(...)
+      - pattern: $CRYPTO.createDecipher(...)
+
+  - id: appsec.auth.insecure-cookie-flags
+    message: >-
+      A cookie is set without the full flag set. Without `httpOnly` any script
+      on the page can read it, which turns one XSS into stolen sessions; without
+      `secure` it travels over plain HTTP; without `sameSite` it is attached to
+      cross-site requests, which is what makes CSRF work. Set
+      `{ httpOnly: true, secure: true, sameSite: "lax" }` on session cookies.
+    severity: WARNING
+    languages: [javascript, typescript]
+    metadata:
+      sentinelDomain: appsec
+      sentinelSeverity: high
+      sentinelConfidence: medium
+      category: security
+      subcategory: [vuln]
+      technology: [express]
+      cwe:
+        - "CWE-1004: Sensitive Cookie Without 'HttpOnly' Flag"
+        - "CWE-614: Sensitive Cookie in HTTPS Session Without 'Secure' Attribute"
+        - "CWE-1275: Sensitive Cookie with Improper SameSite Attribute"
+      owasp:
+        - "A05:2021 - Security Misconfiguration"
+      tags:
+        - sentinel-domain:appsec
+        - sentinel-severity:high
+        - sentinel-confidence:medium
+        - 'sentinel-title:Cookie set without the full flag set'
+        - 'sentinel-impact:Without httpOnly one XSS steals the session; without secure it crosses plain HTTP; without sameSite it enables CSRF.'
+        - 'sentinel-fix:Set { httpOnly: true, secure: true, sameSite: "lax" } on session cookies.'
+    patterns:
+      - pattern-either:
+          - pattern: $RES.cookie($NAME, $VALUE)
+          - pattern: $RES.cookie($NAME, $VALUE, { ... })
+          - pattern: '$STORE.set({ ..., name: $NAME, ... })'
+      - pattern-not: '$RES.cookie($NAME, $VALUE, { ..., httpOnly: true, ..., secure: true, ..., sameSite: $SS, ... })'
+      - pattern-not: '$STORE.set({ ..., httpOnly: true, ..., secure: true, ..., sameSite: $SS, ... })'

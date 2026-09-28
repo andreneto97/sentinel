@@ -1,0 +1,51 @@
+# A developer-local stack: an emulator that needs the Docker socket, a watcher
+# service bind-mounting the checkout as the host user, a browser dashboard and a
+# datastore on a published port. Every signal that makes a compose file a
+# workstation's is here, and so is one of every artifact the rules grade.
+services:
+  localstack:
+    build:
+      context: ../../
+      dockerfile: ./ops/localstack/Dockerfile
+    ports:
+      - '4566:4566'
+    environment:
+      - SERVICES=s3,sqs,lambda
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - EMULATOR_LICENCE_KEY=${EMULATOR_LICENCE_KEY-}
+    volumes:
+      - './seed:/etc/localstack/init/ready.d'
+      - '/var/run/docker.sock:/var/run/docker.sock'
+      - '../../:/workspace'
+    restart: always
+
+  grafana:
+    image: grafana/grafana:11.3.0
+    ports:
+      - '3000:3000'
+    restart: always
+
+  nodejs:
+    build:
+      dockerfile: ./ops/docker/nodejs/Dockerfile
+      context: ../../
+      args:
+        DOCKER_USER_ID: ${userId}
+        DOCKER_GROUP_ID: ${groupId}
+    environment:
+      NODE_ENV: dev
+    volumes:
+      - ../../:/app
+    user: '${userId}:${groupId}'
+    ports:
+      - '8080:8080'
+    restart: always
+
+  db:
+    image: postgres:17
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - '15432:5432'

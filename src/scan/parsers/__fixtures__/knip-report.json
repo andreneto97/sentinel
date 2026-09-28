@@ -1,0 +1,111 @@
+{
+  "issues": [
+    {
+      "file": "src/orphan.ts",
+      "binaries": [],
+      "catalog": [],
+      "catalogReferences": [],
+      "dependencies": [],
+      "devDependencies": [],
+      "duplicates": [],
+      "enumMembers": [],
+      "exports": [],
+      "files": [
+        {
+          "name": "src/orphan.ts"
+        }
+      ],
+      "namespaceMembers": [],
+      "optionalPeerDependencies": [],
+      "types": [],
+      "unlisted": [],
+      "unresolved": []
+    },
+    {
+      "file": "package.json",
+      "binaries": [],
+      "catalog": [],
+      "catalogReferences": [],
+      "dependencies": [
+        {
+          "name": "left-pad",
+          "line": 7,
+          "col": 6,
+          "pos": 117
+        }
+      ],
+      "devDependencies": [
+        {
+          "name": "rimraf",
+          "line": 10,
+          "col": 6,
+          "pos": 170
+        }
+      ],
+      "duplicates": [],
+      "enumMembers": [],
+      "exports": [],
+      "files": [],
+      "namespaceMembers": [],
+      "optionalPeerDependencies": [],
+      "types": [],
+      "unlisted": [],
+      "unresolved": []
+    },
+    {
+      "file": "src/index.ts",
+      "binaries": [],
+      "catalog": [],
+      "catalogReferences": [],
+      "dependencies": [],
+      "devDependencies": [],
+      "duplicates": [],
+      "enumMembers": [],
+      "exports": [],
+      "files": [],
+      "namespaceMembers": [],
+      "optionalPeerDependencies": [],
+      "types": [],
+      "unlisted": [
+        {
+          "name": "not-a-listed-package",
+          "line": 1,
+          "col": 25,
+          "pos": 24
+        }
+      ],
+      "unresolved": []
+    },
+    {
+      "file": "src/b.ts",
+      "binaries": [],
+      "catalog": [],
+      "catalogReferences": [],
+      "dependencies": [],
+      "devDependencies": [],
+      "duplicates": [],
+      "enumMembers": [],
+      "exports": [
+        {
+          "name": "neverUsed",
+          "line": 7,
+          "col": 17,
+          "pos": 123
+        }
+      ],
+      "files": [],
+      "namespaceMembers": [],
+      "optionalPeerDependencies": [],
+      "types": [
+        {
+          "name": "UnusedShape",
+          "line": 9,
+          "col": 13,
+          "pos": 157
+        }
+      ],
+      "unlisted": [],
+      "unresolved": []
+    }
+  ]
+}

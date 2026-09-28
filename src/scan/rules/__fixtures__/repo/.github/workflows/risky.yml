@@ -1,0 +1,22 @@
+name: deploy to production
+on:
+  pull_request_target:
+    branches: [main]
+  issue_comment:
+    types: [created]
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: some-org/deploy-action@v1
+        with:
+          token: ${{ secrets.DEPLOY_TOKEN }}
+      - name: greet
+        run: echo "Hello ${{ github.event.pull_request.title }}"
+      - name: leak
+        run: |
+          echo "token is ${{ secrets.NPM_TOKEN }}"
+          ./deploy.sh

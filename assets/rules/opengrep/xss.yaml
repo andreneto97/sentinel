@@ -1,0 +1,232 @@
+# Sentinel rule pack -- cross-site scripting sinks (D2 appsec).
+#
+# Every rule id is the dotted Sentinel rule id that reaches findings.json.
+# `metadata.tags` carries the routing triple (domain / severity / confidence)
+# because SARIF keeps `tags` but drops unknown metadata keys.
+rules:
+  - id: appsec.xss.dangerously-set-inner-html
+    message: >-
+      This React component renders a value as raw HTML through
+      `dangerouslySetInnerHTML`, bypassing JSX escaping. If any part of that
+      value can be influenced by a user -- a profile field, a comment, a record
+      loaded from the database -- a `<script>` or an `onerror` attribute in it
+      executes in the browser of whoever views the page, with that visitor's
+      session. Sanitise the HTML server-side (DOMPurify or an allow-list
+      sanitiser) before it reaches this prop, or render it as text.
+    severity: ERROR
+    languages: [javascript, typescript]
+    metadata:
+      sentinelDomain: appsec
+      sentinelSeverity: high
+      sentinelConfidence: medium
+      category: security
+      subcategory: [vuln]
+      technology: [react]
+      cwe:
+        - "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+      owasp:
+        - "A03:2021 - Injection"
+      references:
+        - https://react.dev/reference/react-dom/components/common#dangerously-setting-the-inner-html
+      tags:
+        - sentinel-domain:appsec
+        - sentinel-severity:high
+        - sentinel-confidence:medium
+        - 'sentinel-title:React renders unsanitised HTML'
+        - 'sentinel-impact:A stored value that reaches this prop executes script in the session of every visitor who loads the page.'
+        - 'sentinel-fix:Sanitise the HTML with DOMPurify or an allow-list sanitiser before it reaches the prop, or render the value as text.'
+    patterns:
+      - pattern-either:
+          - pattern: "<$EL dangerouslySetInnerHTML={{ __html: $HTML }} />"
+          - pattern: "<$EL dangerouslySetInnerHTML={$OBJ} />"
+      - pattern-not: '<$EL dangerouslySetInnerHTML={{ __html: "..." }} />'
+
+  - id: appsec.xss.inner-html-assignment
+    message: >-
+      A value is written into the DOM as markup (`innerHTML` / `outerHTML` /
+      `insertAdjacentHTML`), so the browser parses it as HTML instead of
+      displaying it as text. Any user-controlled fragment in that value can
+      inject script that runs with the visitor's session. Use `textContent`
+      when the value is text, or sanitise it with DOMPurify when it really has
+      to be HTML.
+    severity: ERROR
+    languages: [javascript, typescript]
+    metadata:
+      sentinelDomain: appsec
+      sentinelSeverity: high
+      sentinelConfidence: medium
+      category: security
+      subcategory: [vuln]
+      technology: [browser]
+      cwe:
+        - "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+      owasp:
+        - "A03:2021 - Injection"
+      tags:
+        - sentinel-domain:appsec
+        - sentinel-severity:high
+        - sentinel-confidence:medium
+        - 'sentinel-title:DOM sink assigned raw markup'
+        - 'sentinel-impact:Script inside the assigned value runs with the visitor''s session, which is enough to read the page and act as that user.'
+        - 'sentinel-fix:Assign to textContent when the value is text; sanitise with DOMPurify when it really has to be HTML.'
+    patterns:
+      - pattern-either:
+          - pattern: $EL.innerHTML = $VALUE
+          - pattern: $EL.outerHTML = $VALUE
+          - pattern: $EL.innerHTML += $VALUE
+          - pattern: $EL.insertAdjacentHTML($POS, $VALUE)
+      - pattern-not: $EL.innerHTML = "..."
+      - pattern-not: $EL.outerHTML = "..."
+      - pattern-not: $EL.innerHTML += "..."
+      - pattern-not: $EL.insertAdjacentHTML($POS, "...")
+      - pattern-not: $EL.innerHTML = ""
+
+  - id: appsec.xss.document-write
+    message: >-
+      `document.write` injects its argument into the page as markup while the
+      document is parsing. Anything user-controlled in that argument becomes
+      executable script, and the call also blocks rendering. Build the node with
+      `createElement` / `textContent` instead.
+    severity: ERROR
+    languages: [javascript, typescript]
+    metadata:
+      sentinelDomain: appsec
+      sentinelSeverity: high
+      sentinelConfidence: medium
+      category: security
+      subcategory: [vuln]
+      technology: [browser]
+      cwe:
+        - "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+      owasp:
+        - "A03:2021 - Injection"
+      tags:
+        - sentinel-domain:appsec
+        - sentinel-severity:high
+        - sentinel-confidence:medium
+        - 'sentinel-title:document.write with a dynamic value'
+        - 'sentinel-impact:The argument is parsed as markup while the page loads, so a user-controlled fragment in it executes as script.'
+        - 'sentinel-fix:Build the node with createElement and textContent instead of writing markup into the parser.'
+    patterns:
+      - pattern-either:
+          - pattern: document.write($VALUE)
+          - pattern: document.writeln($VALUE)
+          - pattern: $DOC.write($VALUE)
+      - metavariable-regex:
+          metavariable: $DOC
+          regex: ^(document|doc|win\.document|iframeDoc)$
+      - pattern-not: document.write("...")
+      - pattern-not: document.writeln("...")
+
+  - id: appsec.xss.javascript-url-from-variable
+    message: >-
+      A `javascript:` URL is being assembled from a variable and assigned to a
+      navigable attribute. Whatever ends up in that variable is executed as
+      script when the link is followed, which turns any stored string into a
+      script-injection point. Build the URL from a fixed allow-list of schemes,
+      or attach a normal event handler instead of a `javascript:` href.
+    severity: ERROR
+    languages: [javascript, typescript]
+    metadata:
+      sentinelDomain: appsec
+      sentinelSeverity: high
+      sentinelConfidence: medium
+      category: security
+      subcategory: [vuln]
+      technology: [browser]
+      cwe:
+        - "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+      owasp:
+        - "A03:2021 - Injection"
+      tags:
+        - sentinel-domain:appsec
+        - sentinel-severity:high
+        - sentinel-confidence:medium
+        - 'sentinel-title:javascript: URL built from a variable'
+        - 'sentinel-impact:Following the link executes whatever the variable holds, turning any stored string into a script-injection point.'
+        - 'sentinel-fix:Restrict the scheme to an allow-list (http, https, mailto) and attach a normal event handler instead.'
+    pattern-either:
+      # Template literals and concatenation chains are easier to pin down with a
+      # regex than with an AST pattern, and the scheme prefix is what matters.
+      - pattern-regex: '`javascript:[^`]*\$\{[^}]+\}'
+      - pattern-regex: '["'']javascript:["'']\s*\+\s*[A-Za-z_$]'
+
+  - id: appsec.xss.unescaped-html-response
+    message: >-
+      An HTTP response body is built by interpolating request data straight into
+      an HTML string. The response is served with an HTML content type, so a
+      `<script>` in the query string, the path or the JSON body is reflected back
+      and executed in the victim's browser. Render through a template engine with
+      auto-escaping, or escape the interpolated values explicitly.
+    severity: ERROR
+    languages: [javascript, typescript]
+    metadata:
+      sentinelDomain: appsec
+      sentinelSeverity: high
+      sentinelConfidence: medium
+      category: security
+      subcategory: [vuln]
+      technology: [express]
+      cwe:
+        - "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"
+      owasp:
+        - "A03:2021 - Injection"
+      tags:
+        - sentinel-domain:appsec
+        - sentinel-severity:high
+        - sentinel-confidence:medium
+        - 'sentinel-title:Request data reflected into an HTML response'
+        - 'sentinel-impact:A script tag in the query string, path or body is echoed back and executed in the victim''s browser.'
+        - 'sentinel-fix:Render through a template engine with auto-escaping, or escape every interpolated value.'
+    patterns:
+      - pattern-either:
+          - pattern: $RES.send(`...${$REQ.$FIELD}...`)
+          - pattern: $RES.send(`...${$REQ.$FIELD.$SUB}...`)
+          - pattern: $RES.send("..." + $REQ.$FIELD)
+          - pattern: $RES.send("..." + $REQ.$FIELD.$SUB)
+          - pattern: $RES.write(`...${$REQ.$FIELD.$SUB}...`)
+          - pattern: $RES.end(`...${$REQ.$FIELD.$SUB}...`)
+      - metavariable-regex:
+          metavariable: $REQ
+          regex: ^(req|request|ctx)$
+      - metavariable-regex:
+          metavariable: $FIELD
+          regex: ^(query|params|body|headers|cookies)$
+
+  - id: appsec.xss.eval-on-non-literal
+    message: >-
+      `eval` / `new Function` compiles its argument as JavaScript. Called on
+      anything but a fixed literal, it hands whoever controls that value the
+      ability to run arbitrary code in this process (server side) or in the
+      visitor's session (browser side). Replace it with an explicit lookup
+      table, `JSON.parse`, or a dedicated expression evaluator.
+    severity: ERROR
+    languages: [javascript, typescript]
+    metadata:
+      sentinelDomain: appsec
+      sentinelSeverity: critical
+      sentinelConfidence: high
+      category: security
+      subcategory: [vuln]
+      technology: [javascript]
+      cwe:
+        - "CWE-95: Improper Neutralization of Directives in Dynamically Evaluated Code ('Eval Injection')"
+      owasp:
+        - "A03:2021 - Injection"
+      tags:
+        - sentinel-domain:appsec
+        - sentinel-severity:critical
+        - sentinel-confidence:high
+        - 'sentinel-title:eval or new Function on a dynamic value'
+        - 'sentinel-impact:Whoever controls the value runs arbitrary code -- in this process on the server, or in the visitor''s session in the browser.'
+        - 'sentinel-fix:Replace it with an explicit lookup table, JSON.parse, or a sandboxed expression evaluator.'
+    patterns:
+      - pattern-either:
+          - pattern: eval($CODE)
+          - pattern: new Function($CODE)
+          - pattern: new Function(..., $CODE)
+          - pattern: globalThis.eval($CODE)
+          - pattern: window.eval($CODE)
+      - pattern-not: eval("...")
+      - pattern-not: new Function("...")
+      - pattern-not: new Function(..., "...")

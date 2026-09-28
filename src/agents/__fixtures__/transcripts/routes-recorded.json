@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "1.0",
+  "source": "recorded",
+  "recordedAt": "2026-09-22T20:49:20.531Z",
+  "model": "claude-opus-5-5",
+  "note": "Captured live against a Claude subscription through @anthropic-ai/claude-agent-sdk 0.3.280 with createRecordingDispatcher. `appsec-routes-001` is a single clean batch. `appsec-routes-correction` is a real two-turn cycle: the system prompt never named `severity`, the schema required it, and turn 2 is the model's own answer to Sentinel's corrective re-prompt. Replies and usage are verbatim; `expectPromptContains` was added afterwards as a replay assertion. `model` records the CLI default at recording time, since no model was pinned.",
+  "entries": [
+    {
+      "batchId": "appsec-routes-001",
+      "turns": [
+        {
+          "reply": "{\"verdicts\":[{\"unitId\":\"route-001\",\"ownershipChecked\":false,\"evidenceLine\":13,\"note\":\"findUnique filters only on req.params.id. There is no tenantId/ownerId predicate and no check after the fetch. requireAuth only confirms the caller is authenticated, so any logged-in user can read any invoice by ID (IDOR). Fix: use findFirst with where { id, tenantId: req.user.tenantId }, or compare invoice.tenantId to req.user.tenantId before responding.\"},{\"unitId\":\"route-002\",\"ownershipChecked\":true,\"evidenceLine\":32,\"note\":\"The query is scoped by tenantId: req.user.tenantId alongside id, so cross-tenant records return 404. Tenant isolation is enforced. There is no per-user owner check within a tenant, which is fine if orders are meant to be visible tenant-wide.\"}]}",
+          "usage": {
+            "inputTokens": 2,
+            "outputTokens": 300,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 728,
+            "costUsd": 0.011831999999999999
+          },
+          "expectPromptContains": ["## unit: route-002"]
+        }
+      ]
+    },
+    {
+      "batchId": "appsec-routes-correction",
+      "turns": [
+        {
+          "reply": "{\"verdicts\":[{\"unitId\":\"route-001\",\"ownershipChecked\":false,\"evidenceLine\":13}]}",
+          "usage": {
+            "inputTokens": 2,
+            "outputTokens": 43,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 520,
+            "costUsd": 0.0050279999999999995
+          },
+          "expectPromptContains": ["## unit: route-001"]
+        },
+        {
+          "reply": "{\"verdicts\":[{\"unitId\":\"route-001\",\"ownershipChecked\":false,\"evidenceLine\":13,\"severity\":\"high\"}]}",
+          "usage": {
+            "inputTokens": 2,
+            "outputTokens": 218,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 677,
+            "costUsd": 0.009784000000000001
+          },
+          "expectPromptContains": ["## Correction required", "severity"]
+        }
+      ]
+    }
+  ]
+}

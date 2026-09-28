@@ -1,0 +1,9 @@
+{
+  "name": "acme",
+  "private": true,
+  "packageManager": "pnpm@9.1.0",
+  "devDependencies": {
+    "turbo": "2.0.3",
+    "typescript": "5.4.5"
+  }
+}

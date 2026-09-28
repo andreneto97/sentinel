@@ -1,0 +1,33 @@
+# The CI stack. Its `db` service ends with a multi-line `command:` flow sequence:
+# the shared YAML reader stops at it, so `redis` below is a service this inventory
+# cannot see. That is what this fixture exists to prove.
+services:
+  nodejs:
+    build:
+      dockerfile: ./ops/compose/devbox/Dockerfile
+      context: ../../
+    environment:
+      NODE_ENV: test
+      NODE_AUTH_TOKEN: ${NODE_AUTH_TOKEN}
+    volumes:
+      - ../../:/app
+    ports:
+      - '3001:3001'
+    restart: always
+
+  db:
+    image: postgres:16.4
+    command: ["postgres",
+      "-c", "wal_level=logical",
+      "-c", "max_wal_senders=8"
+    ]
+    restart: always
+    ports:
+      - '55432:5432'
+    environment:
+      - POSTGRES_PASSWORD=postgres
+
+  redis:
+    image: redis:latest
+    ports:
+      - '6379:6379'

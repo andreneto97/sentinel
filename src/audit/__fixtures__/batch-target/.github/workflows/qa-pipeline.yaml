@@ -1,0 +1,64 @@
+name: QA Pipeline
+
+# The shape the two critical CI checks are about: a `workflow_run` workflow that
+# checks out the pull request's head and then runs a composite action out of that
+# checkout, holding `id-token: write` and a cloud role.
+on:
+  workflow_run:
+    workflows: ['Tests']
+    types: ['completed']
+    branches: ['develop']
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Reason for deploy'
+        type: string
+        required: true
+
+env:
+  AWS_REGION: "us-east-1"
+  ACCOUNT_ID: "123456789012"
+  AWS_ROLE: "ExampleDeployRole"
+  SLACK_CHANNEL: "example-team-alerts"
+
+concurrency:
+  group: qa-pipeline
+  cancel-in-progress: false
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  slack-status-start:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Slack deployment started
+        uses: example-org/action-slack-notification@v2.0.0-alpha.4
+        with:
+          reason: ${{ inputs.reason }}
+          slack-endpoint: ${{ secrets.SLACK_URL }}
+          slack-channel: ${{ env.SLACK_CHANNEL }}
+
+  list-changed-files:
+    needs: slack-status-start
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    name: List changed files
+    runs-on: ubuntu-latest
+    outputs:
+      files: ${{ steps.list.outputs.files }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          fetch-depth: 2
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: arn:aws:iam::${{ env.ACCOUNT_ID }}:role/${{ env.AWS_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: List
+        id: list
+        uses: ./.github/actions/list-changed-files
+        with:
+          event_name: ${{ github.event_name }}

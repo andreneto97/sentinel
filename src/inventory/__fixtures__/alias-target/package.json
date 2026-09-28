@@ -1,0 +1,5 @@
+{
+  "name": "alias-target",
+  "private": true,
+  "dependencies": { "next": "16.3.5" }
+}

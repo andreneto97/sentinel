@@ -1,0 +1,93 @@
+{
+  "schemaVersion": "1.0",
+  "source": "handwritten",
+  "note": "HANDWRITTEN, NOT RECORDED. These turns script failure paths that cannot be provoked on demand against a live subscription: an exhausted plan limit, a reply cut off at the output ceiling, and a batch that never returns usable JSON. The reply bodies imitate the shape of a real reply; nothing here is evidence about how a model behaves.",
+  "model": "claude-opus-5-5",
+  "entries": [
+    {
+      "batchId": "quota-batch",
+      "turns": [
+        {
+          "failure": {
+            "kind": "quota",
+            "detail": "You've reached your usage limit for Claude Code. Your limit resets at 3pm."
+          }
+        }
+      ]
+    },
+    {
+      "batchId": "truncated-batch",
+      "turns": [
+        {
+          "reply": "{\"verdicts\":[{\"unitId\":\"route-001\",\"ownershipChecked\":false,\"evidenceLine\":13,\"note\":\"findUnique filters only on req.params.id, so any authenticated caller can read any in",
+          "usage": {
+            "inputTokens": 2,
+            "outputTokens": 8192,
+            "cacheCreationInputTokens": 520,
+            "costUsd": 0.09
+          }
+        },
+        {
+          "reply": "{\"verdicts\":[{\"unitId\":\"route-001\",\"ownershipChecked\":false,\"evidenceLine\":13,\"note\":\"findUnique filters only on req.params.id, so any authenticated caller can read any in",
+          "usage": {
+            "inputTokens": 2,
+            "outputTokens": 8192,
+            "cacheCreationInputTokens": 520,
+            "costUsd": 0.09
+          }
+        },
+        {
+          "reply": "{\"verdicts\":[{\"unitId\":\"route-001\",\"ownershipChecked\":false,\"evidenceLine\":13,\"note\":\"findUnique filters only on req.params.id, so any authenticated caller can read any in",
+          "usage": {
+            "inputTokens": 2,
+            "outputTokens": 8192,
+            "cacheCreationInputTokens": 520,
+            "costUsd": 0.09
+          }
+        },
+        {
+          "reply": "{\"verdicts\":[]}",
+          "usage": { "outputTokens": 5 }
+        }
+      ]
+    },
+    {
+      "batchId": "stubborn-batch",
+      "turns": [
+        {
+          "reply": "I reviewed the handler and it looks fine to me.",
+          "usage": { "outputTokens": 11 }
+        },
+        {
+          "reply": "Still looks fine. I do not think a JSON document adds anything here.",
+          "usage": { "outputTokens": 16 },
+          "expectPromptContains": ["## Correction required"]
+        },
+        {
+          "reply": "{\"verdicts\":[]}",
+          "usage": { "outputTokens": 5 }
+        }
+      ]
+    },
+    {
+      "batchId": "transient-batch",
+      "turns": [
+        {
+          "failure": { "kind": "transient", "detail": "upstream connect error: 503" }
+        },
+        {
+          "reply": "{\"verdicts\":[{\"unitId\":\"route-002\",\"ownershipChecked\":true,\"evidenceLine\":32}]}",
+          "usage": { "inputTokens": 3, "outputTokens": 40, "costUsd": 0.002 }
+        }
+      ]
+    },
+    {
+      "batchId": "refusal-batch",
+      "turns": [
+        {
+          "failure": { "kind": "refusal", "detail": "the model declined to answer" }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+project_id = "demo"
+
+[functions.checkout]
+verify_jwt = false
+
+[functions.receipts]
+verify_jwt = true

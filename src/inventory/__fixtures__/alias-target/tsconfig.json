@@ -1,0 +1,10 @@
+{
+  // A tsconfig with comments and a trailing comma, which TypeScript allows and
+  // JSON.parse does not: the alias reader has to cope with both.
+  "compilerOptions": {
+    "strict": true,
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  }
+}

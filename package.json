@@ -1,0 +1,35 @@
+{
+  "name": "sentinel",
+  "version": "0.0.1",
+  "type": "module",
+  "description": "A backend dossier for Node.js and TypeScript repositories: dependencies, application security, data layer, delivery pipeline, serverless, API surface, reliability and dead code",
+  "bin": {
+    "sentinel": "./bin/sentinel.ts"
+  },
+  "scripts": {
+    "sentinel": "bun run bin/sentinel.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "test": "bun test src"
+  },
+  "dependencies": {
+    "@anthropic-ai/claude-agent-sdk": "^0.3.142",
+    "pdfkit": "^0.18.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@types/bun": "^1.1.14",
+    "@types/pdfkit": "^0.17.6",
+    "typescript": "^5.6.3"
+  },
+  "engines": {
+    "bun": ">=1.2.0"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/andreneto97/sentinel"
+  }
+}

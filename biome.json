@@ -1,0 +1,36 @@
+{
+  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "files": {
+    "ignore": ["node_modules", "dist", "sentinel", "sentinel-out"]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "nursery": {
+        "noRestrictedImports": {
+          "level": "error",
+          "options": {
+            "paths": {
+              "node:fs": "Filesystem access goes through src/ports/file-system.ts",
+              "node:fs/promises": "Filesystem access goes through src/ports/file-system.ts",
+              "node:child_process": "Process spawning goes through src/ports/process-executor.ts"
+            }
+          }
+        }
+      }
+    }
+  },
+  "overrides": [
+    {
+      "include": ["src/ports/file-system.ts", "src/ports/process-executor.ts"],
+      "linter": { "rules": { "nursery": { "noRestrictedImports": "off" } } }
+    }
+  ]
+}

@@ -1,0 +1,91 @@
+{
+  "modules": [
+    {
+      "source": "src/a.ts",
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/b.ts",
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/index.ts",
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "not-a-listed-package",
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/orphan.ts",
+      "orphan": true,
+      "valid": false
+    }
+  ],
+  "summary": {
+    "violations": [
+      {
+        "type": "cycle",
+        "from": "src/a.ts",
+        "to": "src/b.ts",
+        "unresolvedTo": "./b.ts",
+        "dependencyTypes": ["local", "import"],
+        "rule": {
+          "severity": "warn",
+          "name": "no-circular"
+        },
+        "cycle": [
+          {
+            "name": "src/b.ts",
+            "dependencyTypes": ["local", "import"]
+          },
+          {
+            "name": "src/a.ts",
+            "dependencyTypes": ["local", "import"]
+          }
+        ]
+      },
+      {
+        "type": "module",
+        "from": "src/orphan.ts",
+        "to": "src/orphan.ts",
+        "rule": {
+          "severity": "warn",
+          "name": "no-orphans"
+        }
+      }
+    ],
+    "error": 0,
+    "warn": 2,
+    "info": 0,
+    "totalCruised": 5,
+    "totalDependenciesCruised": 4,
+    "ruleSetUsed": {
+      "forbidden": [
+        {
+          "name": "no-circular",
+          "severity": "warn",
+          "from": {},
+          "to": {
+            "circular": true
+          },
+          "scope": "module"
+        },
+        {
+          "name": "no-orphans",
+          "severity": "warn",
+          "from": {
+            "orphan": true,
+            "pathNot": "[.]d[.]ts$"
+          },
+          "to": {},
+          "scope": "module"
+        }
+      ]
+    }
+  }
+}

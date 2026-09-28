@@ -1,0 +1,8 @@
+{
+  "name": "@nx-demo/tool",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "devDependencies": {
+    "rimraf": "^5.0.0"
+  }
+}

@@ -1,0 +1,28 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Customer {
+  id       String    @id @default(uuid())
+  email    String    @unique
+  name     String?
+  invoices Invoice[]
+
+  @@map("customers")
+}
+
+model Invoice {
+  id         String   @id @default(uuid())
+  customerId String   @map("customer_id")
+  total      Int
+  issuedAt   DateTime @default(now()) @map("issued_at")
+  customer   Customer @relation(fields: [customerId], references: [id])
+
+  @@index([issuedAt])
+  @@map("invoices")
+}

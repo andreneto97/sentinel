@@ -1,0 +1,11 @@
+{
+  "name": "workspace-target",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "bullmq": "5.8.0",
+    "express": "4.19.2",
+    "got": "14.4.1",
+    "stripe": "16.2.0"
+  }
+}

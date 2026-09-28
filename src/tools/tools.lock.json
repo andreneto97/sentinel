@@ -1,0 +1,199 @@
+{
+  "schemaVersion": "1.0",
+  "binaries": {
+    "actionlint": {
+      "version": "1.7.12",
+      "description": "GitHub Actions workflow linting (D4 delivery); missing means CI findings fall back to Sentinel's own rules only.",
+      "platforms": {
+        "darwin-arm64": {
+          "url": "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_darwin_arm64.tar.gz",
+          "sha256": "aba9ced2dee8d27fecca3dc7feb1a7f9a52caefa1eb46f3271ea66b6e0e6953f",
+          "archive": "tar.gz",
+          "binaryPath": "actionlint"
+        },
+        "darwin-x64": {
+          "url": "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_darwin_amd64.tar.gz",
+          "sha256": "5b44c3bc2255115c9b69e30efc0fecdf498fdb63c5d58e17084fd5f16324c644",
+          "archive": "tar.gz",
+          "binaryPath": "actionlint"
+        },
+        "linux-arm64": {
+          "url": "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_arm64.tar.gz",
+          "sha256": "325e971b6ba9bfa504672e29be93c24981eeb1c07576d730e9f7c8805afff0c6",
+          "archive": "tar.gz",
+          "binaryPath": "actionlint"
+        },
+        "linux-x64": {
+          "url": "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz",
+          "sha256": "8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8",
+          "archive": "tar.gz",
+          "binaryPath": "actionlint"
+        }
+      }
+    },
+    "ast-grep": {
+      "version": "0.45.3",
+      "description": "Structural enumeration for the inventory phase (routes, sinks, data-access call sites); missing means coverage cannot be enumerated.",
+      "platforms": {
+        "darwin-arm64": {
+          "url": "https://github.com/ast-grep/ast-grep/releases/download/0.45.3/app-aarch64-apple-darwin.zip",
+          "sha256": "6d2279dea5bea2ad79c66ea93f5fe54ba926e398a8a26de76c56db68fe59eac6",
+          "archive": "zip",
+          "binaryPath": "ast-grep"
+        },
+        "darwin-x64": {
+          "url": "https://github.com/ast-grep/ast-grep/releases/download/0.45.3/app-x86_64-apple-darwin.zip",
+          "sha256": "b2ffd26f42810340326a9e8a084bdc3647a8795c1a3f21fc06bd7bef3c7c5b2c",
+          "archive": "zip",
+          "binaryPath": "ast-grep"
+        },
+        "linux-arm64": {
+          "url": "https://github.com/ast-grep/ast-grep/releases/download/0.45.3/app-aarch64-unknown-linux-gnu.zip",
+          "sha256": "b39cfbc58da4b869a88b8a4bc57bd5deb0d24541e704cf7c257da7b53ec81c8f",
+          "archive": "zip",
+          "binaryPath": "ast-grep"
+        },
+        "linux-x64": {
+          "url": "https://github.com/ast-grep/ast-grep/releases/download/0.45.3/app-x86_64-unknown-linux-gnu.zip",
+          "sha256": "f8ac830881339d1edee6b2652f54798c0f4da5a827f2db38a08ee31117783ce8",
+          "archive": "zip",
+          "binaryPath": "ast-grep"
+        }
+      }
+    },
+    "gitleaks": {
+      "version": "8.30.1",
+      "description": "Secret detection across the worktree and full git history (D2); missing means committed credentials go unreported.",
+      "platforms": {
+        "darwin-arm64": {
+          "url": "https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_darwin_arm64.tar.gz",
+          "sha256": "b40ab0ae55c505963e365f271a8d3846efbc170aa17f2607f13df610a9aeb6a5",
+          "archive": "tar.gz",
+          "binaryPath": "gitleaks"
+        },
+        "darwin-x64": {
+          "url": "https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_darwin_x64.tar.gz",
+          "sha256": "dfe101a4db2255fc85120ac7f3d25e4342c3c20cf749f2c20a18081af1952709",
+          "archive": "tar.gz",
+          "binaryPath": "gitleaks"
+        },
+        "linux-arm64": {
+          "url": "https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_arm64.tar.gz",
+          "sha256": "e4a487ee7ccd7d3a7f7ec08657610aa3606637dab924210b3aee62570fb4b080",
+          "archive": "tar.gz",
+          "binaryPath": "gitleaks"
+        },
+        "linux-x64": {
+          "url": "https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz",
+          "sha256": "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb",
+          "archive": "tar.gz",
+          "binaryPath": "gitleaks"
+        }
+      }
+    },
+    "hadolint": {
+      "version": "2.15.1",
+      "description": "Dockerfile linting (D4 delivery); missing means Dockerfile findings fall back to Sentinel's own rules only.",
+      "platforms": {
+        "darwin-arm64": {
+          "url": "https://github.com/hadolint/hadolint/releases/download/v2.15.1/hadolint-macos-arm64",
+          "sha256": "5c09f3213f8e40406abe048233d985eebef336d4a6a20021be47fadb6cf480a2",
+          "archive": "raw",
+          "binaryPath": "hadolint"
+        },
+        "darwin-x64": {
+          "url": "https://github.com/hadolint/hadolint/releases/download/v2.15.1/hadolint-macos-x86_64",
+          "sha256": "ffe9bb18b23d5ed1eae50237aecdbb523d016e96da0bd4e7aa432040acfc3fde",
+          "archive": "raw",
+          "binaryPath": "hadolint"
+        },
+        "linux-arm64": {
+          "url": "https://github.com/hadolint/hadolint/releases/download/v2.15.1/hadolint-linux-arm64",
+          "sha256": "f6198ef8090f404dbb771abfee086eb8c48ac177f30da7fd3510aca35b344b5d",
+          "archive": "raw",
+          "binaryPath": "hadolint"
+        },
+        "linux-x64": {
+          "url": "https://github.com/hadolint/hadolint/releases/download/v2.15.1/hadolint-linux-x86_64",
+          "sha256": "c7187db94eeeeca956519a6af171adc31453941a1e777961f6e680f697c8c507",
+          "archive": "raw",
+          "binaryPath": "hadolint"
+        }
+      }
+    },
+    "opengrep": {
+      "version": "1.30.0",
+      "description": "SAST over Sentinel's own rule pack (D2 appsec); missing means injection and XSS-sink rules do not run.",
+      "platforms": {
+        "darwin-arm64": {
+          "url": "https://github.com/opengrep/opengrep/releases/download/v1.30.0/opengrep_osx_arm64",
+          "sha256": "0f5bc3dec09d995c61331a4017b856ede508f90d95b018d95f1dc6166be89fdd",
+          "archive": "raw",
+          "binaryPath": "opengrep"
+        },
+        "darwin-x64": {
+          "url": "https://github.com/opengrep/opengrep/releases/download/v1.30.0/opengrep_osx_x86",
+          "sha256": "650772a849a2986880982b7dea0371f96a75d354de95f94e8c1a2e6f8f6262d1",
+          "archive": "raw",
+          "binaryPath": "opengrep"
+        },
+        "linux-arm64": {
+          "url": "https://github.com/opengrep/opengrep/releases/download/v1.30.0/opengrep_manylinux_aarch64",
+          "sha256": "a5d5a4a58ba5d46ff51e921663da1c2bba38f4b03987f4aeec87f16c6ad3ecae",
+          "archive": "raw",
+          "binaryPath": "opengrep"
+        },
+        "linux-x64": {
+          "url": "https://github.com/opengrep/opengrep/releases/download/v1.30.0/opengrep_manylinux_x86",
+          "sha256": "35779bdd72e92129c8df2a77f0c55e8c08356801ea92591ef32108d6b28d564c",
+          "archive": "raw",
+          "binaryPath": "opengrep"
+        }
+      }
+    },
+    "trivy": {
+      "version": "0.74.0",
+      "description": "Dependency CVEs, CycloneDX SBOM and `trivy config` for Dockerfile/compose/K8s/Terraform (D1, D4); missing means no CVE or IaC coverage.",
+      "platforms": {
+        "darwin-arm64": {
+          "url": "https://github.com/aquasecurity/trivy/releases/download/v0.74.0/trivy_0.74.0_macOS-ARM64.tar.gz",
+          "sha256": "1caada5e0e2091909357c7525d3aa76f4b660b13821bc143b190c7483e31cc11",
+          "archive": "tar.gz",
+          "binaryPath": "trivy"
+        },
+        "darwin-x64": {
+          "url": "https://github.com/aquasecurity/trivy/releases/download/v0.74.0/trivy_0.74.0_macOS-64bit.tar.gz",
+          "sha256": "472816f6888dda689d075c30254d4210b4d1035acf365aa72332f584c2f60485",
+          "archive": "tar.gz",
+          "binaryPath": "trivy"
+        },
+        "linux-arm64": {
+          "url": "https://github.com/aquasecurity/trivy/releases/download/v0.74.0/trivy_0.74.0_Linux-ARM64.tar.gz",
+          "sha256": "b94ce1976bbf3c15b514b605ee88be7c6d94a29be2302847ff01cb794d47aad5",
+          "archive": "tar.gz",
+          "binaryPath": "trivy"
+        },
+        "linux-x64": {
+          "url": "https://github.com/aquasecurity/trivy/releases/download/v0.74.0/trivy_0.74.0_Linux-64bit.tar.gz",
+          "sha256": "2ae6fe3ee734b7fdf11335663e18c75ea12dccc76062f09f164a3b0f8be4371a",
+          "archive": "tar.gz",
+          "binaryPath": "trivy"
+        }
+      }
+    }
+  },
+  "node": {
+    "dependency-cruiser": {
+      "package": "dependency-cruiser",
+      "version": "18.4.0",
+      "description": "Circular dependencies and orphan modules (D8 dead code).",
+      "binaryPath": "node_modules/.bin/depcruise"
+    },
+    "knip": {
+      "package": "knip",
+      "version": "6.37.0",
+      "description": "Unused files, exports and dependencies (D1, D8); candidates are verified by the phase 5 agent before they reach the report.",
+      "binaryPath": "node_modules/.bin/knip"
+    }
+  }
+}

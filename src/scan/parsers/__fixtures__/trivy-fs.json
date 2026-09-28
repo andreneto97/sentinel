@@ -1,0 +1,395 @@
+{
+  "SchemaVersion": 2,
+  "Trivy": {
+    "Version": "0.74.0"
+  },
+  "ReportID": "01a0ca8f-2948-7269-83be-5eda9fa3abc0",
+  "CreatedAt": "2026-09-22T16:19:34.984158-03:00",
+  "ArtifactName": ".",
+  "ArtifactType": "filesystem",
+  "Results": [
+    {
+      "Target": "package-lock.json",
+      "Class": "lang-pkgs",
+      "Type": "npm",
+      "Packages": [
+        {
+          "ID": "express@4.17.1",
+          "Name": "express",
+          "Identifier": {
+            "PURL": "pkg:npm/express@4.17.1",
+            "UID": "99af781ba1652893"
+          },
+          "Version": "4.17.1",
+          "Licenses": ["MIT"],
+          "Relationship": "direct",
+          "DependsOn": ["body-parser@1.19.0", "cookie@0.4.0", "qs@6.7.0"],
+          "Locations": [
+            {
+              "StartLine": 19,
+              "EndLine": 27
+            }
+          ],
+          "AnalyzedBy": "npm"
+        },
+        {
+          "ID": "lodash@4.17.15",
+          "Name": "lodash",
+          "Identifier": {
+            "PURL": "pkg:npm/lodash@4.17.15",
+            "UID": "ced48d1b8e14f19b"
+          },
+          "Version": "4.17.15",
+          "Licenses": ["GPL-3.0-only"],
+          "Relationship": "direct",
+          "Locations": [
+            {
+              "StartLine": 43,
+              "EndLine": 46
+            }
+          ],
+          "AnalyzedBy": "npm"
+        },
+        {
+          "ID": "request@2.88.2",
+          "Name": "request",
+          "Identifier": {
+            "PURL": "pkg:npm/request@2.88.2",
+            "UID": "30d76303d4dd8345"
+          },
+          "Version": "2.88.2",
+          "Licenses": ["Apache-2.0"],
+          "Relationship": "direct",
+          "DependsOn": ["tough-cookie@2.5.0"],
+          "Locations": [
+            {
+              "StartLine": 47,
+              "EndLine": 53
+            }
+          ],
+          "AnalyzedBy": "npm"
+        },
+        {
+          "ID": "body-parser@1.19.0",
+          "Name": "body-parser",
+          "Identifier": {
+            "PURL": "pkg:npm/body-parser@1.19.0",
+            "UID": "ab9bb1a1c7a386c6"
+          },
+          "Version": "1.19.0",
+          "Licenses": ["Apache-2.0"],
+          "Indirect": true,
+          "Relationship": "indirect",
+          "DependsOn": ["qs@6.7.0"],
+          "Locations": [
+            {
+              "StartLine": 28,
+              "EndLine": 34
+            }
+          ],
+          "AnalyzedBy": "npm"
+        },
+        {
+          "ID": "cookie@0.4.0",
+          "Name": "cookie",
+          "Identifier": {
+            "PURL": "pkg:npm/cookie@0.4.0",
+            "UID": "7c0e489802dd291b"
+          },
+          "Version": "0.4.0",
+          "Indirect": true,
+          "Relationship": "indirect",
+          "Locations": [
+            {
+              "StartLine": 35,
+              "EndLine": 38
+            }
+          ],
+          "AnalyzedBy": "npm"
+        },
+        {
+          "ID": "qs@6.7.0",
+          "Name": "qs",
+          "Identifier": {
+            "PURL": "pkg:npm/qs@6.7.0",
+            "UID": "961c2869db5cea6e"
+          },
+          "Version": "6.7.0",
+          "Licenses": ["(MIT OR LGPL-2.1-or-later)"],
+          "Indirect": true,
+          "Relationship": "indirect",
+          "Locations": [
+            {
+              "StartLine": 39,
+              "EndLine": 42
+            }
+          ],
+          "AnalyzedBy": "npm"
+        },
+        {
+          "ID": "tough-cookie@2.5.0",
+          "Name": "tough-cookie",
+          "Identifier": {
+            "PURL": "pkg:npm/tough-cookie@2.5.0",
+            "UID": "60c9140a3ecfebb9"
+          },
+          "Version": "2.5.0",
+          "Licenses": ["BSD-3-Clause"],
+          "Indirect": true,
+          "Relationship": "indirect",
+          "Locations": [
+            {
+              "StartLine": 54,
+              "EndLine": 57
+            }
+          ],
+          "AnalyzedBy": "npm"
+        }
+      ],
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2024-45590",
+          "VendorIDs": ["GHSA-qwcr-r2fm-qrc7"],
+          "PkgID": "body-parser@1.19.0",
+          "PkgName": "body-parser",
+          "PkgIdentifier": {
+            "PURL": "pkg:npm/body-parser@1.19.0",
+            "UID": "ab9bb1a1c7a386c6"
+          },
+          "InstalledVersion": "1.19.0",
+          "FixedVersion": "1.20.3",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2024-45590",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory npm",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Anpm"
+          },
+          "Fingerprint": "sha256:8115317ddbc51671c8fc521d425dfe5d9a775836dc780455ebf8217f6c9c9d1c",
+          "Title": "body-parser: Denial of Service Vulnerability in body-parser",
+          "Description": "body-parser is Node.js body parsing middleware. body-parser <1.20.3 is vulnerable to denial of service when url encoding is enabled. A malicious actor using a specially crafted payload could flood the server with a large number of requests, resulting in denial of service. This issue is patched in 1.20.3.",
+          "Severity": "HIGH",
+          "CweIDs": ["CWE-405"],
+          "VendorSeverity": {
+            "azure": 3,
+            "cbl-mariner": 3,
+            "ghsa": 3,
+            "nvd": 3,
+            "redhat": 3
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:N/VI:N/VA:H/SC:N/SI:N/SA:N",
+              "V3Score": 7.5,
+              "V40Score": 8.7
+            },
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2024-45590",
+            "https://github.com/expressjs/body-parser"
+          ],
+          "PublishedDate": "2024-09-10T16:15:21.083Z",
+          "LastModifiedDate": "2026-06-17T07:54:31.697Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2021-23337",
+          "VendorIDs": ["GHSA-35jh-r3h4-6jhm"],
+          "PkgID": "lodash@4.17.15",
+          "PkgName": "lodash",
+          "PkgIdentifier": {
+            "PURL": "pkg:npm/lodash@4.17.15",
+            "UID": "ced48d1b8e14f19b"
+          },
+          "InstalledVersion": "4.17.15",
+          "FixedVersion": "4.17.21",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2021-23337",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory npm",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Anpm"
+          },
+          "Fingerprint": "sha256:9d4ffe9613502b3854efcf2fe22ba8cc38374c50048171f4ac17d96b2f0cf8e7",
+          "Title": "nodejs-lodash: command injection via template",
+          "Description": "Lodash versions prior to 4.17.21 are vulnerable to Command Injection via the template function.",
+          "Severity": "HIGH",
+          "CweIDs": ["CWE-94"],
+          "VendorSeverity": {
+            "ghsa": 3,
+            "nvd": 3,
+            "redhat": 2,
+            "ruby-advisory-db": 3,
+            "ubuntu": 2
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:H/I:H/A:H",
+              "V3Score": 7.2
+            },
+            "nvd": {
+              "V2Vector": "AV:N/AC:L/Au:S/C:P/I:P/A:P",
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:H/I:H/A:H",
+              "V2Score": 6.5,
+              "V3Score": 7.2
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:H/UI:N/S:U/C:H/I:H/A:H",
+              "V3Score": 7.2
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2021-23337",
+            "https://cert-portal.siemens.com/productcert/pdf/ssa-637483.pdf"
+          ],
+          "PublishedDate": "2021-02-15T13:15:12.56Z",
+          "LastModifiedDate": "2026-06-17T03:38:34.773Z"
+        },
+        {
+          "VulnerabilityID": "NSWG-ECO-516",
+          "PkgID": "lodash@4.17.15",
+          "PkgName": "lodash",
+          "PkgIdentifier": {
+            "PURL": "pkg:npm/lodash@4.17.15",
+            "UID": "ced48d1b8e14f19b"
+          },
+          "InstalledVersion": "4.17.15",
+          "FixedVersion": ">=4.17.19",
+          "Status": "fixed",
+          "SeveritySource": "nodejs-security-wg",
+          "PrimaryURL": "https://www.npmjs.com/advisories/1523",
+          "DataSource": {
+            "ID": "nodejs-security-wg",
+            "Name": "Node.js Ecosystem Security Working Group",
+            "URL": "https://github.com/nodejs/security-wg"
+          },
+          "Fingerprint": "sha256:e598a33ada2dcd801c6214c310a9430d296e925d52da1aadfc970d9a1a85ce57",
+          "Title": "Allocation of Resources Without Limits or Throttling",
+          "Description": "Prototype pollution attack (lodash)",
+          "Severity": "HIGH",
+          "VendorSeverity": {
+            "nodejs-security-wg": 3
+          },
+          "References": [
+            "https://github.com/lodash/lodash/pull/4759",
+            "https://hackerone.com/reports/712065"
+          ]
+        },
+        {
+          "VulnerabilityID": "CVE-2022-24999",
+          "VendorIDs": ["GHSA-hrpp-h998-j3pp"],
+          "PkgID": "qs@6.7.0",
+          "PkgName": "qs",
+          "PkgIdentifier": {
+            "PURL": "pkg:npm/qs@6.7.0",
+            "UID": "961c2869db5cea6e"
+          },
+          "InstalledVersion": "6.7.0",
+          "FixedVersion": "6.10.3, 6.9.7, 6.8.3, 6.7.3, 6.6.1, 6.5.3, 6.4.1, 6.3.3, 6.2.4",
+          "Status": "fixed",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2022-24999",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory npm",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Anpm"
+          },
+          "Fingerprint": "sha256:6556c7f71ef6fffe31b1ac2a66ee179aae1afbfc02a368a82cc4ca1b1794aa2b",
+          "Title": "express: \"qs\" prototype poisoning causes the hang of the node process",
+          "Description": "qs before 6.10.3, as used in Express before 4.17.3 and other products, allows attackers to cause a Node process hang for an Express application because an __ proto__ key can be used. In many typical Express use cases, an unauthenticated remote attacker can place the attack payload in the query string of the URL that...",
+          "Severity": "HIGH",
+          "CweIDs": ["CWE-1321"],
+          "VendorSeverity": {
+            "alma": 2,
+            "ghsa": 3,
+            "nvd": 3,
+            "oracle-oval": 2,
+            "redhat": 2,
+            "rocky": 2,
+            "ubuntu": 2
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 7.5
+            }
+          },
+          "References": [
+            "https://access.redhat.com/errata/RHSA-2023:0050",
+            "https://access.redhat.com/security/cve/CVE-2022-24999"
+          ],
+          "PublishedDate": "2022-11-26T22:15:10.153Z",
+          "LastModifiedDate": "2026-06-17T04:32:55.2Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2023-28155",
+          "VendorIDs": ["GHSA-p8p7-x288-28g6"],
+          "PkgID": "request@2.88.2",
+          "PkgName": "request",
+          "PkgIdentifier": {
+            "PURL": "pkg:npm/request@2.88.2",
+            "UID": "30d76303d4dd8345"
+          },
+          "InstalledVersion": "2.88.2",
+          "Status": "affected",
+          "SeveritySource": "ghsa",
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2023-28155",
+          "DataSource": {
+            "ID": "ghsa",
+            "Name": "GitHub Security Advisory npm",
+            "URL": "https://github.com/advisories?query=type%3Areviewed+ecosystem%3Anpm"
+          },
+          "Fingerprint": "sha256:cc7b55ff607e3c838845ee6422009469be24905b7c5b0d830722be39fd16f950",
+          "Title": "request: bypass of SSRF mitigations when following a cross-protocol redirect",
+          "Description": "The Request package through 2.88.1 for Node.js allows a bypass of SSRF mitigations via an attacker-controller server that does a cross-protocol redirect (HTTP to HTTPS, or HTTPS to HTTP). NOTE: This vulnerability only affects products that are no longer supported by the maintainer.",
+          "Severity": "MEDIUM",
+          "CweIDs": ["CWE-918"],
+          "VendorSeverity": {
+            "cbl-mariner": 2,
+            "ghsa": 2,
+            "nvd": 2,
+            "redhat": 2
+          },
+          "CVSS": {
+            "ghsa": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N",
+              "V3Score": 6.1
+            },
+            "nvd": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N",
+              "V3Score": 6.1
+            },
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N",
+              "V3Score": 6.1
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2023-28155",
+            "https://doyensec.com/resources/Doyensec_Advisory_RequestSSRF_Q12023.pdf"
+          ],
+          "PublishedDate": "2023-03-16T15:15:11.107Z",
+          "LastModifiedDate": "2026-06-17T05:46:59.167Z"
+        }
+      ]
+    }
+  ]
+}

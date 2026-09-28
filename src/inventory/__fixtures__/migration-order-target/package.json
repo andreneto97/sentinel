@@ -1,0 +1,8 @@
+{
+  "name": "migration-order-target",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "typeorm": "0.3.20"
+  }
+}
